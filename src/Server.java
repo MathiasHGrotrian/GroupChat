@@ -1,7 +1,6 @@
+
 // Java implementation of Server side
 // It contains two classes : Server and ClientHandler
-// Save file as Server.java
-
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -9,76 +8,62 @@ import java.net.*;
 // Server class
 public class Server
 {
-
-    // Vector to store active clients
-    static ArrayList<ClientHandler> ar = new ArrayList<>();
-
-    // counter for clients
-    static int i = 0;
+    // ArrayList to store active clients
+    static ArrayList<ClientHandler> clientList = new ArrayList<>();
 
     public static void main(String[] args) throws IOException
     {
-        // server is listening on port 1234
-        ServerSocket ss = new ServerSocket(1234);
+        //create a socket for sever and a open socket
+        ServerSocket serverSocket = new ServerSocket(1234);
+        Socket socket;
 
-        Socket s;
-
-        // running infinite loop for getting
-        // client request
+        //while-loop for getting client request
         while (true)
         {
-            // Accept the incoming request
-            s = ss.accept();
+            //Accept the incoming request
+            socket = serverSocket.accept();
 
-            System.out.println("New client request received : " + s);
+            System.out.println("J_OK");
 
-            // obtain input and output streams
-            DataInputStream dis = new DataInputStream(s.getInputStream());
-            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+            //initiate input and output streams
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            System.out.println("Creating a new handler for this client...");
 
             // Create a new handler object for handling this request.
-            ClientHandler mtch = new ClientHandler(s,"client " + i, dis, dos);
+            //indsæt eget navn i clienthandler
+            ClientHandler clientHandler = new ClientHandler(socket,"new inout client ", inputStream, outputStream);
 
-            // Create a new Thread with this object.
-            Thread t = new Thread(mtch);
+            // Create a new Thread with the clientHandler object
+            Thread thread = new Thread(clientHandler);
 
-            System.out.println("Adding this client to active client list");
+            //husk, lav en socket.out til alle om en ny bruger
 
-            // add this client to active clients list
-            ar.add(mtch);
+            //client add to list
+            clientList.add(clientHandler);
 
-            // start the thread.
-            t.start();
-
-            // increment i for new client.
-            // i is used for naming only, and can be replaced
-            // by any naming scheme
-            i++;
-
+            thread.start();
         }
     }
 }
 
-// ClientHandler class
+//ClientHandler class
 class ClientHandler implements Runnable
 {
-    Scanner scn = new Scanner(System.in);
-    private String name;
-    final DataInputStream dis;
-    final DataOutputStream dos;
-    Socket s;
-    boolean isloggedin;
+    private String username;
+    final DataInputStream inputStream;
+    final DataOutputStream outputStream;
+    Socket socket;
+    boolean isAlive;
 
-    // constructor
-    public ClientHandler(Socket s, String name,
-                         DataInputStream dis, DataOutputStream dos) {
-        this.dis = dis;
-        this.dos = dos;
-        this.name = name;
-        this.s = s;
-        this.isloggedin=true;
+    //constructor
+    public ClientHandler(Socket socket, String username, DataInputStream inputStream, DataOutputStream outputStream)
+    {
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+        this.username = username;
+        this.socket = socket;
+        this.isAlive =true;
     }
 
     @Override
@@ -90,28 +75,27 @@ class ClientHandler implements Runnable
             try
             {
                 // receive the string
-                received = dis.readUTF();
-
+                received = inputStream.readUTF();
                 System.out.println(received);
 
-                if(received.equals("logout")){
-                    this.isloggedin=false;
-                    this.s.close();
+                if(received.equals("QUIT")){
+                    this.isAlive =false;
+                    this.socket.close();
                     break;
                 }
 
 
 
                 // search for the recipient in the connected devices list.
-                // ar is the vector storing client of active users
-                for (ClientHandler mc : Server.ar)
+                // clientList is the vector storing client of active users
+                for (ClientHandler mc : Server.clientList)
                 {
                     // if the recipient is found, write on its
                     // output stream
 
-                    if(!mc.name.equals(this.name))
+                    if(!mc.username.equals(this.username))
                     {
-                        mc.dos.writeUTF(this.name +" : "+received);
+                        mc.outputStream.writeUTF(this.username +" : "+received);
                     }
 
 
@@ -126,8 +110,8 @@ class ClientHandler implements Runnable
         try
         {
             // closing resources
-            this.dis.close();
-            this.dos.close();
+            this.inputStream.close();
+            this.outputStream.close();
 
         }catch(IOException e){
             e.printStackTrace();
