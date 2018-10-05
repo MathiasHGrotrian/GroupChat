@@ -92,7 +92,7 @@ class ClientHandler implements Runnable
             try
             {
                 //sends a request about a username
-                outputStream.writeUTF("indtast navn");
+                outputStream.writeUTF("Indtast navn");
                 //receive a string,  nameNew
                 nameNew = inputStream.readUTF();
                 for(ClientHandler handler : Server.clientList)
@@ -108,6 +108,7 @@ class ClientHandler implements Runnable
                 {
                     setUsername(nameNew);
                     outputStream.writeUTF("J_OK");
+                    System.out.println("JOIN " + username);
 
                 }
             }catch (IOException e)
@@ -150,7 +151,7 @@ class ClientHandler implements Runnable
                     //the if-statment makes sure that the same client don´t gets it´s own message back.
                     if(!clientHandler.username.equals(this.username))
                     {
-                        clientHandler.outputStream.writeUTF(this.username +" : "+received);
+                        clientHandler.outputStream.writeUTF("DATA " + this.username +" : "+received);
                     }
                 }
             } catch (IOException e) {

@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7aa75595-d2ef-48da-8de7-78f0db2387bc" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/out/production/MultiTEST/ClientHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -19,8 +17,8 @@
       <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="861">
-              <caret line="136" column="93" selection-start-line="136" selection-start-column="93" selection-end-line="136" selection-end-column="93" />
+            <state relative-caret-position="356">
+              <caret line="153" column="74" selection-start-line="153" selection-start-column="74" selection-end-line="153" selection-end-column="74" />
               <folding>
                 <element signature="e#0#3305#0" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -36,8 +34,8 @@
       <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="244">
-              <caret line="42" selection-start-line="42" selection-end-line="42" />
+            <state relative-caret-position="960">
+              <caret line="64" column="63" lean-forward="true" selection-start-line="64" selection-start-column="63" selection-end-line="64" selection-end-column="63" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -71,7 +69,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="147" />
     <option name="y" value="32" />
     <option name="width" value="1700" />
@@ -198,12 +196,12 @@
       <option name="presentableId" value="Default" />
       <updated>1538638068410</updated>
       <workItem from="1538638069967" duration="6297000" />
-      <workItem from="1538721155838" duration="7963000" />
+      <workItem from="1538721155838" duration="8721000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14260000" />
+    <option name="totallyTimeSpent" value="15018000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="147" y="32" width="1700" height="983" extended-state="0" />
@@ -218,7 +216,7 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.11661166" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.19581959" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
@@ -273,8 +271,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="42" selection-start-line="42" selection-end-line="42" />
+        <state relative-caret-position="960">
+          <caret line="64" column="63" lean-forward="true" selection-start-line="64" selection-start-column="63" selection-end-line="64" selection-end-column="63" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -283,8 +281,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="861">
-          <caret line="136" column="93" selection-start-line="136" selection-start-column="93" selection-end-line="136" selection-end-column="93" />
+        <state relative-caret-position="356">
+          <caret line="153" column="74" selection-start-line="153" selection-start-column="74" selection-end-line="153" selection-end-column="74" />
           <folding>
             <element signature="e#0#3305#0" expanded="true" />
             <element signature="imports" expanded="true" />
