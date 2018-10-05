@@ -47,6 +47,7 @@ public class Server
             thread.start();
         }
     }
+
 }
 
 //ClientHandler class
@@ -66,6 +67,7 @@ class ClientHandler implements Runnable
         this.outputStream = outputStream;
         this.socket = socket;
         this.isAlive =true;
+        this.username = "";
     }
 
     public void setUsername(String username)
@@ -73,12 +75,17 @@ class ClientHandler implements Runnable
         this.username = username;
     }
 
+    public String getUsername()
+    {
+        return username;
+    }
+
     @Override
     public void run() {
 
+        //variables for receiving message and for naming clienthandler
         String received;
         String nameNew = "";
-        Scanner scanner = new Scanner(System.in);
 
         while (nameNew.length() == 0)
         {
@@ -88,9 +95,20 @@ class ClientHandler implements Runnable
                 outputStream.writeUTF("indtast navn");
                 //receive a string,  nameNew
                 nameNew = inputStream.readUTF();
-                if(!(nameNew.length() < 0) && !(nameNew.length() > 12))
+                for(ClientHandler handler : Server.clientList)
+                {
+                    if(handler.getUsername().equals(nameNew))
+                    {
+                        outputStream.writeUTF("401: Duplicate username");
+                        nameNew = "";
+                        break;
+                    }
+                }
+                if(!(nameNew.length() == 0) && !(nameNew.length() > 12))
                 {
                     setUsername(nameNew);
+                    outputStream.writeUTF("J_OK");
+
                 }
             }catch (IOException e)
             {
@@ -99,8 +117,9 @@ class ClientHandler implements Runnable
 
         }
 
-        while (true)
+        while (isAlive)
         {
+
             try
             {
                 //receive a string, (readUTF can read standard format).
@@ -110,7 +129,18 @@ class ClientHandler implements Runnable
                 //quit statment
                 if(received.equals("QUIT")){
                     this.isAlive =false;
+
+                    Server.clientList.remove(this);
+
+                    for(ClientHandler clientHandler : Server.clientList)
+                    {
+                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n" + listToString(Server.clientList));
+                    }
+
+                    System.out.println("QUIT " + username);
+
                     this.socket.close();
+
                     break;
                 }
 
@@ -133,10 +163,26 @@ class ClientHandler implements Runnable
         {
             this.inputStream.close();
             this.outputStream.close();
+
         } catch(IOException e){
             e.printStackTrace();
         }
 
 
+    }
+
+    private String listToString(ArrayList<ClientHandler> list)
+    {
+        String listOfClients = "";
+        for (ClientHandler clienthandler : list)
+        {
+            if(clienthandler.getUsername().length() != 0)
+            {
+                listOfClients += clienthandler.getUsername() + "\n ";
+            }
+
+        }
+
+        return listOfClients;
     }
 }

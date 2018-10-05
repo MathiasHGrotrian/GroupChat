@@ -6,7 +6,7 @@ public class Client
 {
     final static int ServerPort = 1234;
 
-    public static void main(String args[]) throws IOException
+    public static void main(String args[]) throws IOException, UnknownHostException
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -33,8 +33,16 @@ public class Client
 
                     try
                     {
+
                         //write on the output stream
                         outputStream.writeUTF(message);
+
+                        if(message.equals("QUIT"))
+                        {
+                            socket.close();
+
+                            System.exit(1);
+                        }
                     } catch (IOException e)
                     {
                         e.printStackTrace();
