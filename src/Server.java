@@ -85,22 +85,33 @@ class ClientHandler implements Runnable
 
         //variables for receiving message and for naming clienthandler
         String received;
-        String nameNew = "";
+        boolean isTrue = true;
 
-        while (nameNew.length() == 0)
+        while (isTrue)
         {
             try
             {
+                String nameNew;
                 //sends a request about a username
                 outputStream.writeUTF("Indtast navn");
                 //receive a string,  nameNew
                 nameNew = inputStream.readUTF();
                 for(ClientHandler handler : Server.clientList)
                 {
+                    if(nameNew.equalsIgnoreCase("imav"))
+                    {
+                        outputStream.writeUTF("502: Bad command");
+
+                        nameNew = "";
+
+                        break;
+                    }
                     if(handler.getUsername().equals(nameNew))
                     {
                         outputStream.writeUTF("401: Duplicate username");
+
                         nameNew = "";
+
                         break;
                     }
                 }
@@ -109,6 +120,7 @@ class ClientHandler implements Runnable
                     setUsername(nameNew);
                     outputStream.writeUTF("J_OK");
                     System.out.println("JOIN " + username);
+                    isTrue = false;
 
                 }
             }catch (IOException e)

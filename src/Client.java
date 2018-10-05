@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.Timer;
 
 public class Client
 {
@@ -72,8 +73,34 @@ public class Client
             }
         });
 
+        Thread imAlive = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        Thread.sleep(60000);
+                        outputStream.writeUTF("IMAV");
+                    } catch (InterruptedException iEx)
+                    {
+                        iEx.printStackTrace();
+                    } catch (IOException ioEx)
+                    {
+                        ioEx.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
         //starts threads
         sendMessage.start();
         readMessage.start();
+        //imAlive.start();
     }
+
+
 }
