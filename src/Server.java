@@ -14,6 +14,7 @@ public class Server
     public static void main(String[] args) throws IOException
     {
         //create a socket for sever and a open socket
+        //one socket for Server and one for ClientHandler
         ServerSocket serverSocket = new ServerSocket(1234);
         Socket socket;
 
@@ -23,6 +24,7 @@ public class Server
             //Accept the incoming request
             socket = serverSocket.accept();
 
+            //Vi sletter dig senere!!!!
             System.out.println("J_OK");
 
             //initiate input and output streams
@@ -32,7 +34,7 @@ public class Server
 
             // Create a new handler object for handling this request.
             //indsæt eget navn i clienthandler
-            ClientHandler clientHandler = new ClientHandler(socket,"new inout client ", inputStream, outputStream);
+            ClientHandler clientHandler = new ClientHandler(socket, inputStream, outputStream);
 
             // Create a new Thread with the clientHandler object
             Thread thread = new Thread(clientHandler);
@@ -50,6 +52,7 @@ public class Server
 //ClientHandler class
 class ClientHandler implements Runnable
 {
+    //variabler
     private String username;
     final DataInputStream inputStream;
     final DataOutputStream outputStream;
@@ -57,64 +60,83 @@ class ClientHandler implements Runnable
     boolean isAlive;
 
     //constructor
-    public ClientHandler(Socket socket, String username, DataInputStream inputStream, DataOutputStream outputStream)
+    public ClientHandler(Socket socket, DataInputStream inputStream, DataOutputStream outputStream)
     {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
-        this.username = username;
         this.socket = socket;
         this.isAlive =true;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 
     @Override
     public void run() {
 
         String received;
+        String nameNew = "";
+        Scanner scanner = new Scanner(System.in);
+
+        while (nameNew.length() == 0)
+        {
+            try
+            {
+                //sends a request about a username
+                outputStream.writeUTF("indtast navn");
+                //receive a string,  nameNew
+                nameNew = inputStream.readUTF();
+                if(!(nameNew.length() < 0) && !(nameNew.length() > 12))
+                {
+                    setUsername(nameNew);
+                }
+            }catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+
         while (true)
         {
             try
             {
-                // receive the string
+                //receive a string, (readUTF can read standard format).
                 received = inputStream.readUTF();
                 System.out.println(received);
 
+                //quit statment
                 if(received.equals("QUIT")){
                     this.isAlive =false;
                     this.socket.close();
                     break;
                 }
 
-
-
-                // search for the recipient in the connected devices list.
-                // clientList is the vector storing client of active users
-                for (ClientHandler mc : Server.clientList)
+                //sending message to other clients by a for-loop
+                for (ClientHandler clientHandler : Server.clientList)
                 {
-                    // if the recipient is found, write on its
-                    // output stream
-
-                    if(!mc.username.equals(this.username))
+                    //the if-statment makes sure that the same client don´t gets it´s own message back.
+                    if(!clientHandler.username.equals(this.username))
                     {
-                        mc.outputStream.writeUTF(this.username +" : "+received);
+                        clientHandler.outputStream.writeUTF(this.username +" : "+received);
                     }
-
-
-
                 }
             } catch (IOException e) {
-
                 e.printStackTrace();
             }
-
         }
+
+        //closing resources for safety
         try
         {
-            // closing resources
             this.inputStream.close();
             this.outputStream.close();
-
-        }catch(IOException e){
+        } catch(IOException e){
             e.printStackTrace();
         }
+
+
     }
 }
