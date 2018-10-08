@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.util.Timer;
 
 public class Client
 {
@@ -21,7 +20,7 @@ public class Client
         DataInputStream inputStream = new DataInputStream(socket.getInputStream());
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-        //sendMessage thread
+        //thread for sending messages
         Thread sendMessage = new Thread(new Runnable()
         {
             @Override
@@ -29,15 +28,17 @@ public class Client
             {
                 while (true)
                 {
-                    //sets the message to input from scanner
+                    //sets the message to users input from scanner
                     String message = scanner.nextLine();
 
                     try
                     {
 
-                        //write on the output stream
+                        //sends message to server by writing on the output stream
                         outputStream.writeUTF(message);
 
+                        //checks if exit message has been typed
+                        //closes connection and shuts down if it has
                         if(message.equals("QUIT"))
                         {
                             socket.close();
@@ -52,7 +53,7 @@ public class Client
             }
         });
 
-        //readMessage thread
+        //thread for reading messages
         Thread readMessage = new Thread(new Runnable()
         {
             @Override
@@ -62,9 +63,12 @@ public class Client
                 {
                     try
                     {
-                        //read the message
+                        //reads the message from the servers outputstrem
                         String message = inputStream.readUTF();
+
+                        //prints out the message received from server
                         System.out.println(message);
+
                     } catch (IOException e)
                     {
                         e.printStackTrace();
@@ -73,6 +77,7 @@ public class Client
             }
         });
 
+        //thread for sending I'm alive messages each time 60 seconds have passed
         Thread imAlive = new Thread(new Runnable()
         {
             @Override
@@ -82,8 +87,12 @@ public class Client
                 {
                     try
                     {
+                        //puts thread to sleep for a specified ammount of time
                         Thread.sleep(60000);
+
+                        //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");
+
                     } catch (InterruptedException iEx)
                     {
                         iEx.printStackTrace();

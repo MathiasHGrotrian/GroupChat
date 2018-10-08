@@ -21,7 +21,7 @@ public class Server
         //while-loop for getting client request
         while (true)
         {
-            //Accept the incoming request
+            //accept the incoming request
             socket = serverSocket.accept();
 
             //Vi sletter dig senere!!!!
@@ -31,19 +31,18 @@ public class Server
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-
-            // Create a new handler object for handling this request.
-            //indsæt eget navn i clienthandler
+            //create a new handler object for handling this request
             ClientHandler clientHandler = new ClientHandler(socket, inputStream, outputStream);
 
-            // Create a new Thread with the clientHandler object
+            //create a new Thread with the clientHandler object
             Thread thread = new Thread(clientHandler);
 
             //husk, lav en socket.out til alle om en ny bruger
 
-            //client add to list
+            //adds clienthandler to list of clienthandlers
             clientList.add(clientHandler);
 
+            //starts the clienthandler thread
             thread.start();
         }
     }
@@ -83,21 +82,29 @@ class ClientHandler implements Runnable
     @Override
     public void run() {
 
-        //variables for receiving message and for naming clienthandler
+        //variable for receiving message
         String received;
+
         boolean isTrue = true;
 
         while (isTrue)
         {
             try
             {
+                //variable used for naming clienthandler
                 String nameNew;
+
                 //sends a request about a username
                 outputStream.writeUTF("Indtast navn");
+
                 //receive a string,  nameNew
                 nameNew = inputStream.readUTF();
+
+                //for each loop to run through list of clienthandlers
                 for(ClientHandler handler : Server.clientList)
                 {
+                    //checks to make sure client hasn't entered imav as name
+                    //imav is treated as a bad command and loop starts over
                     if(nameNew.equalsIgnoreCase("imav"))
                     {
                         outputStream.writeUTF("502: Bad command");
@@ -106,6 +113,9 @@ class ClientHandler implements Runnable
 
                         break;
                     }
+
+                    //checks if any clienthandlers already have the username entered by the user
+                    //gives duplicate username error to user and loop starts over
                     if(handler.getUsername().equals(nameNew))
                     {
                         outputStream.writeUTF("401: Duplicate username");
@@ -115,11 +125,27 @@ class ClientHandler implements Runnable
                         break;
                     }
                 }
+
+                //performs checks to length of entered username to make sure it fits restrictions
                 if(!(nameNew.length() == 0) && !(nameNew.length() > 12))
                 {
+
                     setUsername(nameNew);
+
                     outputStream.writeUTF("J_OK");
+
+                    //prints a join message to the server with username
+                    //MAY NEED TO ADD PORT NUMBER AND IP ADDRESS TO JOIN MESSAGE
                     System.out.println("JOIN " + username);
+
+                    //prints list of clienthandlers as clienthandler has been succesfully named and added to list
+                    for(ClientHandler clientHandler : Server.clientList)
+                    {
+                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
+                                + listToString(Server.clientList));
+                    }
+
+                    //breaks out of loop when username is ok
                     isTrue = false;
 
                 }
@@ -135,19 +161,25 @@ class ClientHandler implements Runnable
 
             try
             {
-                //receive a string, (readUTF can read standard format).
+                //receive a string from clients outputstream, (readUTF can read standard format).
                 received = inputStream.readUTF();
+
+                //prints out message on server
                 System.out.println(received);
 
-                //quit statment
+                //quit statement
                 if(received.equals("QUIT")){
                     this.isAlive =false;
 
+                    //removes clienthandler from the list of clienthandlers currently connected to server
                     Server.clientList.remove(this);
 
+                    //prints a list of every clienthandler connected to the server, to every client
+                    //is updated when a client disconnects from server
                     for(ClientHandler clientHandler : Server.clientList)
                     {
-                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n" + listToString(Server.clientList));
+                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
+                                + listToString(Server.clientList));
                     }
 
                     System.out.println("QUIT " + username);
@@ -157,18 +189,21 @@ class ClientHandler implements Runnable
                     break;
                 }
 
-                //sending message to other clients by a for-loop
+                //sending message to other clients using a for each loop
                 for (ClientHandler clientHandler : Server.clientList)
                 {
-                    //the if-statment makes sure that the same client don´t gets it´s own message back.
+                    //the if-statment makes sure that the same client don´t gets it´s own message back
+                    //prints out message to all other clients
                     if(!clientHandler.username.equals(this.username))
                     {
-                        clientHandler.outputStream.writeUTF("DATA " + this.username +" : "+received);
+                        clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
                     }
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
 
         //closing resources for safety
@@ -184,6 +219,8 @@ class ClientHandler implements Runnable
 
     }
 
+    //prints an arraylist of clienthandlers out in a readable format
+    //is used every time a client connects to, or disconnects from the server
     private String listToString(ArrayList<ClientHandler> list)
     {
         String listOfClients = "";
