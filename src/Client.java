@@ -88,39 +88,11 @@ public class Client
                 {
                     try
                     {
-
-                        Date date1 = new Date();
-
-                        long time1 = date1.getTime();
-
-                        System.out.println(time1);
-
                         //puts thread to sleep for a specified ammount of time
-                        Thread.sleep(60000);
+                        Thread.sleep(5000);
 
                         //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");
-
-
-                        Date date2 = new Date();
-
-                        long time2 = date2.getTime();
-
-                        System.out.println(time2);
-
-                        long difference = time2 - time1;
-
-                        System.out.println(difference);
-
-                        if(difference > 60010)
-                        {
-                            outputStream.writeUTF("QUIT");
-
-                            socket.close();
-
-                            System.exit(1);
-                        }
-
 
                     } catch (InterruptedException iEx)
                     {

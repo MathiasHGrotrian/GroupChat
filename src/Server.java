@@ -1,6 +1,3 @@
-
-// Java implementation of Server side
-// It contains two classes : Server and ClientHandler
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -36,8 +33,6 @@ public class Server
 
             //create a new Thread with the clientHandler object
             Thread thread = new Thread(clientHandler);
-
-            //husk, lav en socket.out til alle om en ny bruger
 
             //adds clienthandler to list of clienthandlers
             clientList.add(clientHandler);
@@ -157,8 +152,15 @@ class ClientHandler implements Runnable
 
         }
 
-        while (isAlive)
+        CountDown countDown = new CountDown();
+
+        Thread thread = new Thread(countDown);
+
+        thread.start();
+
+        while (countDown.getSecondsPassed() < 10)
         {
+            System.out.println(countDown.getSecondsPassed());
 
             try
             {
@@ -168,9 +170,15 @@ class ClientHandler implements Runnable
                 //prints out message on server
                 System.out.println(received);
 
+                if(received.equalsIgnoreCase("IMAV"))
+                {
+                    System.out.println(countDown.getSecondsPassed());
+                    countDown.setSecondsPassed(0);
+                }
+
+
                 //quit statement
-                if(received.equals("QUIT")){
-                    this.isAlive =false;
+                if(received.equals("QUIT") || !isAlive){
 
                     //removes clienthandler from the list of clienthandlers currently connected to server
                     Server.clientList.remove(this);
@@ -207,9 +215,12 @@ class ClientHandler implements Runnable
 
         }
 
+        System.out.println("connection closed");
+
         //closing resources for safety
         try
         {
+            System.out.println("closed connection");
             this.inputStream.close();
             this.outputStream.close();
 
