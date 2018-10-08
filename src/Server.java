@@ -69,6 +69,7 @@ class ClientHandler implements Runnable
         this.username = "";
     }
 
+
     public void setUsername(String username)
     {
         this.username = username;
@@ -95,7 +96,7 @@ class ClientHandler implements Runnable
                 String nameNew;
 
                 //sends a request about a username
-                outputStream.writeUTF("Indtast navn");
+                outputStream.writeUTF("Type username");
 
                 //receive a string,  nameNew
                 nameNew = inputStream.readUTF();
