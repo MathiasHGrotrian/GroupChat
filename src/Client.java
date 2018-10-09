@@ -70,6 +70,13 @@ public class Client
                         //prints out the message received from server
                         System.out.println(message);
 
+                        //if the received message is "QUIT", you are kicked out by admin (^^)
+                        if(message.equals("QUIT"))
+                        {
+                            socket.close();
+                            System.exit(1);
+                        }
+
                     } catch (IOException e)
                     {
                         e.printStackTrace();

@@ -52,7 +52,6 @@ class ClientHandler implements Runnable
     final DataInputStream inputStream;
     final DataOutputStream outputStream;
     Socket socket;
-    boolean isAlive;
 
     //constructor
     public ClientHandler(Socket socket, DataInputStream inputStream, DataOutputStream outputStream)
@@ -60,7 +59,6 @@ class ClientHandler implements Runnable
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.socket = socket;
-        this.isAlive =true;
         this.username = "";
     }
 
@@ -152,18 +150,41 @@ class ClientHandler implements Runnable
 
         }
 
+        //thread to check if clients is alive
         CountDown countDown = new CountDown();
-
         Thread thread = new Thread(countDown);
-
         thread.start();
 
-        while (countDown.getSecondsPassed() < 10)
+        while (true)
         {
-            System.out.println(countDown.getSecondsPassed());
-
             try
             {
+                //checks is client is alive, if not stop while loop and socket
+                if (countDown.getSecondsPassed() >= 60)
+                {
+                    //stop timer in countdown
+                    countDown.setOn(false);
+
+                    //removes clienthandler from the list of clienthandlers currently connected to server
+                    Server.clientList.remove(this);
+
+                    //prints a list of every clienthandler connected to the server, to every client
+                    for(ClientHandler clientHandler : Server.clientList)
+                    {
+                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
+                                + listToString(Server.clientList));
+                    }
+
+                    System.out.println("QUIT " + username);
+
+                    //to quit clint
+                    outputStream.writeUTF("QUIT");
+                    this.socket.close();
+
+                    break;
+                }
+
+
                 //receive a string from clients outputstream, (readUTF can read standard format).
                 received = inputStream.readUTF();
 
@@ -172,13 +193,15 @@ class ClientHandler implements Runnable
 
                 if(received.equalsIgnoreCase("IMAV"))
                 {
+
                     System.out.println(countDown.getSecondsPassed());
-                    countDown.setSecondsPassed(0);
+                   // countDown.setSecondsPassed(0);
                 }
 
 
                 //quit statement
-                if(received.equals("QUIT") || !isAlive){
+                if(received.equals("QUIT"))
+                {
 
                     //removes clienthandler from the list of clienthandlers currently connected to server
                     Server.clientList.remove(this);
@@ -208,11 +231,9 @@ class ClientHandler implements Runnable
                         clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
 
         System.out.println("connection closed");
@@ -242,9 +263,7 @@ class ClientHandler implements Runnable
             {
                 listOfClients += clienthandler.getUsername() + "\n ";
             }
-
         }
-
         return listOfClients;
     }
 }
