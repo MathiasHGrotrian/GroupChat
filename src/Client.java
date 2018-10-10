@@ -1,27 +1,106 @@
 import java.io.*;
 import java.net.*;
-import java.util.Date;
 import java.util.Scanner;
 
 public class Client
 {
-    final static int ServerPort = 1234;
+    //final static int ServerPort = 1234;
 
     public static void main(String args[]) throws IOException, UnknownHostException
     {
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Please choose an option\n" +
+                "1. Local host server\n" +
+                "2. Custom server");
+
+        String serverOption = scanner.nextLine();
+
+        switch (serverOption)
+        {
+            case "1":
+            {
+                localHostServer();
+
+                break;
+            }
+
+            case "2":
+            {
+                customServer();
+
+                break;
+            }
+
+            default:
+            {
+                System.out.println("501 : Unknown command");
+
+                break;
+            }
+        }
+
+
+    }
+
+    private static void localHostServer() throws IOException
+    {
+        Scanner scanner = new Scanner(System.in);
+
+        int serverPort = 1234;
+
         //setting localhost as ip address
         InetAddress ipAddress = InetAddress.getByName("localhost");
 
         //establish the socket connection
-        Socket socket = new Socket(ipAddress, ServerPort);
+        Socket socket = new Socket(ipAddress, serverPort);
 
         //initiating input and out streams
         DataInputStream inputStream = new DataInputStream(socket.getInputStream());
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-        //thread for sending messages
+        sendMessage(outputStream, scanner, socket);
+
+        readMessage(inputStream, socket);
+
+        imAlive(outputStream);
+    }
+
+    private static void customServer() throws IOException
+    {
+        String ip;
+
+        int serverPort;
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Please enter the IP address of the server you would like to connect to.");
+
+        ip = scanner.nextLine();
+
+        System.out.println("Please enter the serverport number");
+
+        serverPort = scanner.nextInt();
+
+        //setting localhost as ip address
+        InetAddress ipAddress = InetAddress.getByName(ip);
+
+        //establish the socket connection
+        Socket socket = new Socket(ipAddress, serverPort);
+
+        //initiating input and out streams
+        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+        sendMessage(outputStream, scanner, socket);
+
+        readMessage(inputStream, socket);
+
+        imAlive(outputStream);
+    }
+
+    private static void sendMessage(DataOutputStream outputStream, Scanner scanner, Socket socket)
+    {
         Thread sendMessage = new Thread(new Runnable()
         {
             @Override
@@ -52,8 +131,15 @@ public class Client
                     }
                 }
             }
+
+
         });
 
+        sendMessage.start();
+    }
+
+    private static void readMessage(DataInputStream inputStream, Socket socket)
+    {
         //thread for reading messages
         Thread readMessage = new Thread(new Runnable()
         {
@@ -85,6 +171,11 @@ public class Client
             }
         });
 
+        readMessage.start();
+    }
+
+    private static void imAlive(DataOutputStream outputStream)
+    {
         //thread for sending I'm alive messages each time 60 seconds have passed
         Thread imAlive = new Thread(new Runnable()
         {
@@ -95,8 +186,8 @@ public class Client
                 {
                     try
                     {
-                        //puts thread to sleep for a specified ammount of time
-                        Thread.sleep(5000);
+                        //puts thread to sleep for a specified amount of time
+                        Thread.sleep(6000);
 
                         //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");
@@ -113,11 +204,7 @@ public class Client
             }
         });
 
-        //starts threads
-        sendMessage.start();
-        readMessage.start();
         imAlive.start();
     }
-
 
 }

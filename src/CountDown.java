@@ -3,7 +3,7 @@ import java.util.TimerTask;
 
 public class CountDown implements Runnable
 {
-    //initiate variabler
+    //initiate variables
     int secondsPassed = 0;
     boolean isOn = true;
     Timer timer = new Timer();

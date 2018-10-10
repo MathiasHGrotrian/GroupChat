@@ -91,7 +91,7 @@ class ClientHandler implements Runnable
                 //sends a request about a username
                 outputStream.writeUTF("Type username");
 
-                //receive a string,  nameNew
+                //receive a string, nameNew
                 nameNew = inputStream.readUTF();
 
                 //for each loop to run through list of clienthandlers
@@ -159,7 +159,7 @@ class ClientHandler implements Runnable
         {
             try
             {
-                //checks is client is alive, if not stop while loop and socket
+                //checks is client is alive, if not stop while loop and close socket
                 if (countDown.getSecondsPassed() >= 60)
                 {
                     //stop timer in countdown
@@ -177,7 +177,7 @@ class ClientHandler implements Runnable
 
                     System.out.println("QUIT " + username);
 
-                    //to quit clint
+                    //to quit client
                     outputStream.writeUTF("QUIT");
                     this.socket.close();
 
@@ -193,7 +193,6 @@ class ClientHandler implements Runnable
 
                 if(received.equalsIgnoreCase("IMAV"))
                 {
-
                     System.out.println(countDown.getSecondsPassed());
                    // countDown.setSecondsPassed(0);
                 }
@@ -221,16 +220,20 @@ class ClientHandler implements Runnable
                     break;
                 }
 
-                //sending message to other clients using a for each loop
-                for (ClientHandler clientHandler : Server.clientList)
+                if(!received.equalsIgnoreCase("imav"))
                 {
-                    //the if-statment makes sure that the same client don´t gets it´s own message back
-                    //prints out message to all other clients
-                    if(!clientHandler.username.equals(this.username))
+                    //sending message to other clients using a for each loop
+                    for (ClientHandler clientHandler : Server.clientList)
                     {
-                        clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
+                        //the if-statment makes sure that the same client doesn't gets its own message back
+                        //prints out message to all other clients
+                        if(!clientHandler.username.equals(this.username))
+                        {
+                            clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
+                        }
                     }
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -257,11 +260,12 @@ class ClientHandler implements Runnable
     private String listToString(ArrayList<ClientHandler> list)
     {
         String listOfClients = "";
+
         for (ClientHandler clienthandler : list)
         {
             if(clienthandler.getUsername().length() != 0)
             {
-                listOfClients += clienthandler.getUsername() + "\n ";
+                listOfClients += clienthandler.getUsername() + "\n";
             }
         }
         return listOfClients;
