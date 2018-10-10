@@ -192,7 +192,7 @@ public class Client
                     try
                     {
                         //puts thread to sleep for a specified amount of time
-                        Thread.sleep(10000);
+                        Thread.sleep(50000);
 
                         //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");

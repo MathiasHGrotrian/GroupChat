@@ -88,7 +88,6 @@ class ClientHandler implements Runnable
 
         nameClient();
 
-
         //thread to check if clients is alive
         CountDown countDown = new CountDown();
         Thread thread = new Thread(countDown);
@@ -229,7 +228,7 @@ class ClientHandler implements Runnable
     private boolean checkImAlive(String received, CountDown countDown) throws IOException
     {
             //checks is client is alive, if not stop while loop and close socket
-            if (countDown.getSecondsPassed() >= 10)
+            if (countDown.getSecondsPassed() >= 60)
             {
                 //stop timer in countdown
                 countDown.setOn(false);
