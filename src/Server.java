@@ -10,6 +10,11 @@ public class Server
 
     public static void main(String[] args) throws IOException
     {
+        startServer();
+    }
+
+    private static void startServer() throws IOException
+    {
         //create a socket for sever and a open socket
         //one socket for Server and one for ClientHandler
         ServerSocket serverSocket = new ServerSocket(1234);
@@ -47,11 +52,11 @@ public class Server
 //ClientHandler class
 class ClientHandler implements Runnable
 {
-    //variabler
+    //variables
     private String username;
-    final DataInputStream inputStream;
-    final DataOutputStream outputStream;
-    Socket socket;
+    private final DataInputStream inputStream;
+    private final DataOutputStream outputStream;
+    private Socket socket;
 
     //constructor
     public ClientHandler(Socket socket, DataInputStream inputStream, DataOutputStream outputStream)

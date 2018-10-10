@@ -4,8 +4,6 @@ import java.util.Scanner;
 
 public class Client
 {
-    //final static int ServerPort = 1234;
-
     public static void main(String args[]) throws IOException, UnknownHostException
     {
         Scanner scanner = new Scanner(System.in);
@@ -68,10 +66,13 @@ public class Client
 
     private static void customServer() throws IOException
     {
+        //string for storing storing the server ip
         String ip;
 
+        //int for storing the serverport
         int serverPort;
 
+        //scanner used for getting server ip and port from user
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter the IP address of the server you would like to connect to.");
@@ -81,6 +82,10 @@ public class Client
         System.out.println("Please enter the serverport number");
 
         serverPort = scanner.nextInt();
+
+        //new scanner to be passed as argument in sendMessage method
+        //done to prevent duplicate username error when user is prompted for username
+        Scanner input = new Scanner(System.in);
 
         //setting localhost as ip address
         InetAddress ipAddress = InetAddress.getByName(ip);
@@ -92,7 +97,7 @@ public class Client
         DataInputStream inputStream = new DataInputStream(socket.getInputStream());
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-        sendMessage(outputStream, scanner, socket);
+        sendMessage(outputStream, input, socket);
 
         readMessage(inputStream, socket);
 
