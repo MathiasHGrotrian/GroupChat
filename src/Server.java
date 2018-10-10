@@ -23,7 +23,7 @@ public class Server
         //while-loop for getting client request
         while (true)
         {
-            //accept the incoming request
+            //accept the incoming request and listen for clients trying to connect on socket
             socket = serverSocket.accept();
 
             //Vi sletter dig senere!!!!
@@ -86,11 +86,85 @@ class ClientHandler implements Runnable
 
         boolean isTrue = true;
 
+        nameClient();
+
+
+        //thread to check if clients is alive
+        CountDown countDown = new CountDown();
+        Thread thread = new Thread(countDown);
+        thread.start();
+
+        while(isTrue)
+        {
+            try
+            {
+                received = inputStream.readUTF();
+
+                if(!checkImAlive(received, countDown))
+                {
+                    isTrue = false;
+                }
+
+                if (!checkMessage(received))
+                {
+                    isTrue = false;
+                }
+
+
+
+            }
+            catch (IOException ioEx)
+            {
+                ioEx.printStackTrace();
+            }
+        }
+
+        System.out.println("connection closed");
+
+        //closing resources for safety
+        try
+        {
+            System.out.println("closed connection");
+            this.inputStream.close();
+            this.outputStream.close();
+
+        } catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    //prints an arraylist of clienthandlers out in a readable format
+    //is used every time a client connects to, or disconnects from the server
+    private void alertUsersOfChanges(ArrayList<ClientHandler> clientHandlers, DataOutputStream outputStream) throws IOException
+    {
+        String listOfClients = "";
+
+        for (ClientHandler clienthandler : clientHandlers)
+        {
+            if(clienthandler.getUsername().length() != 0)
+            {
+                listOfClients += clienthandler.getUsername() + "\n";
+            }
+        }
+        for(ClientHandler clientHandler : clientHandlers)
+        {
+            clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
+                    + listOfClients);
+        }
+
+    }
+
+    private void nameClient()
+    {
+        boolean isTrue = true;
+
         while (isTrue)
         {
             try
             {
-                //variable used for naming clienthandler
+                //variable used for naming clientHandler objects
                 String nameNew;
 
                 //sends a request about a username
@@ -138,11 +212,7 @@ class ClientHandler implements Runnable
                     System.out.println("JOIN " + username);
 
                     //prints list of clienthandlers as clienthandler has been succesfully named and added to list
-                    for(ClientHandler clientHandler : Server.clientList)
-                    {
-                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
-                                + listToString(Server.clientList));
-                    }
+                    alertUsersOfChanges(Server.clientList, outputStream);
 
                     //breaks out of loop when username is ok
                     isTrue = false;
@@ -154,125 +224,74 @@ class ClientHandler implements Runnable
             }
 
         }
+    }
 
-        //thread to check if clients is alive
-        CountDown countDown = new CountDown();
-        Thread thread = new Thread(countDown);
-        thread.start();
-
-        while (true)
-        {
-            try
+    private boolean checkImAlive(String received, CountDown countDown) throws IOException
+    {
+            //checks is client is alive, if not stop while loop and close socket
+            if (countDown.getSecondsPassed() >= 10)
             {
-                //checks is client is alive, if not stop while loop and close socket
-                if (countDown.getSecondsPassed() >= 60)
-                {
-                    //stop timer in countdown
-                    countDown.setOn(false);
+                //stop timer in countdown
+                countDown.setOn(false);
 
-                    //removes clienthandler from the list of clienthandlers currently connected to server
-                    Server.clientList.remove(this);
+                //removes clienthandler from the list of clienthandlers currently connected to server
+                Server.clientList.remove(this);
 
-                    //prints a list of every clienthandler connected to the server, to every client
-                    for(ClientHandler clientHandler : Server.clientList)
-                    {
-                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
-                                + listToString(Server.clientList));
-                    }
+                //prints a list of every clienthandler connected to the server, to every client
+                alertUsersOfChanges(Server.clientList,outputStream);
 
-                    System.out.println("QUIT " + username);
+                System.out.println("QUIT " + username);
 
-                    //to quit client
-                    outputStream.writeUTF("QUIT");
-                    this.socket.close();
+                //to quit client
+                outputStream.writeUTF("QUIT");
+                this.socket.close();
 
-                    break;
-                }
-
-
-                //receive a string from clients outputstream, (readUTF can read standard format).
-                received = inputStream.readUTF();
-
-                //prints out message on server
-                System.out.println(received);
-
-                if(received.equalsIgnoreCase("IMAV"))
-                {
-                    System.out.println(countDown.getSecondsPassed());
-                   // countDown.setSecondsPassed(0);
-                }
-
-
-                //quit statement
-                if(received.equals("QUIT"))
-                {
-
-                    //removes clienthandler from the list of clienthandlers currently connected to server
-                    Server.clientList.remove(this);
-
-                    //prints a list of every clienthandler connected to the server, to every client
-                    //is updated when a client disconnects from server
-                    for(ClientHandler clientHandler : Server.clientList)
-                    {
-                        clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
-                                + listToString(Server.clientList));
-                    }
-
-                    System.out.println("QUIT " + username);
-
-                    this.socket.close();
-
-                    break;
-                }
-
-                if(!received.equalsIgnoreCase("imav"))
-                {
-                    //sending message to other clients using a for each loop
-                    for (ClientHandler clientHandler : Server.clientList)
-                    {
-                        //the if-statment makes sure that the same client doesn't gets its own message back
-                        //prints out message to all other clients
-                        if(!clientHandler.username.equals(this.username))
-                        {
-                            clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                return false;
             }
-        }
 
-        System.out.println("connection closed");
+            if(received.equalsIgnoreCase("IMAV"))
+            {
+                System.out.println(countDown.getSecondsPassed());
+                countDown.setSecondsPassed(0);
+            }
 
-        //closing resources for safety
-        try
-        {
-            System.out.println("closed connection");
-            this.inputStream.close();
-            this.outputStream.close();
-
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-
+            return true;
 
     }
 
-    //prints an arraylist of clienthandlers out in a readable format
-    //is used every time a client connects to, or disconnects from the server
-    private String listToString(ArrayList<ClientHandler> list)
+    private boolean checkMessage(String received) throws IOException
     {
-        String listOfClients = "";
-
-        for (ClientHandler clienthandler : list)
+        //quit statement
+        if(received.equals("QUIT"))
         {
-            if(clienthandler.getUsername().length() != 0)
+
+            //removes clienthandler from the list of clienthandlers currently connected to server
+            Server.clientList.remove(this);
+
+            //prints a list of every clienthandler connected to the server, to every client
+            //is updated when a client disconnects from server
+            alertUsersOfChanges(Server.clientList,outputStream);
+
+            System.out.println("QUIT " + username);
+
+            this.socket.close();
+
+            return false;
+        }
+
+        if(!received.equalsIgnoreCase("imav"))
+        {
+            //sending message to other clients using a for each loop
+            for (ClientHandler clientHandler : Server.clientList)
             {
-                listOfClients += clienthandler.getUsername() + "\n";
+                //the if-statment makes sure that the same client doesn't gets its own message back
+                //prints out message to all other clients
+                if(!clientHandler.username.equals(this.username))
+                {
+                    clientHandler.outputStream.writeUTF("DATA " + this.username +" : " + received);
+                }
             }
         }
-        return listOfClients;
+        return true;
     }
 }
