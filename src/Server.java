@@ -87,8 +87,15 @@ class ClientHandler implements Runnable
         String received;
 
         boolean isTrue = true;
+        try
+        {
+            nameClient();
+        }
+        catch (IOException ioEx)
+        {
+            ioEx.printStackTrace();
+        }
 
-        nameClient();
 
         //thread to check if clients is alive
         CountDown countDown = new CountDown();
@@ -158,12 +165,15 @@ class ClientHandler implements Runnable
 
     }
 
-    private void nameClient()
+    private void nameClient() throws IOException
     {
         boolean isTrue = true;
 
+        String received = inputStream.readUTF();
+
         while (isTrue)
         {
+
             try
             {
                 //variable used for naming clientHandler objects
@@ -208,14 +218,13 @@ class ClientHandler implements Runnable
                 //performs checks to length of entered username to make sure it fits restrictions
                 if(!(nameNew.length() == 0) && !(nameNew.length() > 12))
                 {
-
                     setUsername(nameNew);
 
                     outputStream.writeUTF("J_OK");
 
                     //prints a join message to the server with username
                     //MAY NEED TO ADD PORT NUMBER AND IP ADDRESS TO JOIN MESSAGE
-                    System.out.println("JOIN " + username);
+                    System.out.println("JOIN " + username + received);
 
                     //prints list of clienthandlers as clienthandler has been succesfully named and added to list
                     alertUsersOfChanges(Server.clientList, outputStream);

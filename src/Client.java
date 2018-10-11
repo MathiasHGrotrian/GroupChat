@@ -41,11 +41,10 @@ public class Client
 
     }
 
-    private static void initializerSetup(Socket socket, Scanner scanner) throws IOException
+    private static void initializerSetup(Socket socket, Scanner scanner, DataOutputStream outputStream) throws IOException
     {
-        //initiating input and out streams
+        //initializing inputstream
         DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
         sendMessage(outputStream, scanner, socket);
 
@@ -66,7 +65,11 @@ public class Client
         //establish the socket connection
         Socket socket = new Socket(ipAddress, serverPort);
 
-        initializerSetup(socket, scanner);
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+        outputStream.writeUTF("");
+
+        initializerSetup(socket, scanner, outputStream);
 
     }
 
@@ -99,7 +102,11 @@ public class Client
         //establish the socket connection
         Socket socket = new Socket(ipAddress, serverPort);
 
-        initializerSetup(socket, input);
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+        outputStream.writeUTF( ", " + ip + " : " + serverPort);
+
+        initializerSetup(socket, input, outputStream);
     }
 
     private static void sendMessage(DataOutputStream outputStream, Scanner scanner, Socket socket)
