@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // Server class
 public class Server
@@ -118,6 +120,7 @@ class ClientHandler implements Runnable
             }
         }
 
+
         System.out.println("connection closed");
 
         //closing resources for safety
@@ -172,12 +175,16 @@ class ClientHandler implements Runnable
                 //receive a string, nameNew
                 nameNew = inputStream.readUTF();
 
+                Pattern p = Pattern.compile("[^a-z0-9_-]", Pattern.CASE_INSENSITIVE);
+                Matcher m = p.matcher(nameNew);
+                boolean b = m.find();
+
                 //for each loop to run through list of clienthandlers
                 for(ClientHandler handler : Server.clientList)
                 {
                     //checks to make sure client hasn't entered imav as name
                     //imav is treated as a bad command and loop starts over
-                    if(nameNew.equalsIgnoreCase("imav"))
+                    if(nameNew.equalsIgnoreCase("imav") || b || (nameNew.length() == 0) || (nameNew.length() > 12))
                     {
                         outputStream.writeUTF("502: Bad command");
 
@@ -228,7 +235,7 @@ class ClientHandler implements Runnable
     private boolean checkImAlive(String received, CountDown countDown) throws IOException
     {
             //checks is client is alive, if not stop while loop and close socket
-            if (countDown.getSecondsPassed() >= 60)
+            if (countDown.getSecondsPassed() >= 70)
             {
                 //stop timer in countdown
                 countDown.setOn(false);
@@ -250,7 +257,6 @@ class ClientHandler implements Runnable
 
             if(received.equalsIgnoreCase("IMAV"))
             {
-                System.out.println(countDown.getSecondsPassed());
                 countDown.setSecondsPassed(0);
             }
 

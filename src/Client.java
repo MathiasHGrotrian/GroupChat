@@ -41,6 +41,19 @@ public class Client
 
     }
 
+    private static void initializerSetup(Socket socket, Scanner scanner) throws IOException
+    {
+        //initiating input and out streams
+        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+        sendMessage(outputStream, scanner, socket);
+
+        readMessage(inputStream, socket);
+
+        imAlive(outputStream);
+    }
+
     private static void localHostServer() throws IOException
     {
         Scanner scanner = new Scanner(System.in);
@@ -53,15 +66,8 @@ public class Client
         //establish the socket connection
         Socket socket = new Socket(ipAddress, serverPort);
 
-        //initiating input and out streams
-        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+        initializerSetup(socket, scanner);
 
-        sendMessage(outputStream, scanner, socket);
-
-        readMessage(inputStream, socket);
-
-        imAlive(outputStream);
     }
 
     private static void customServer() throws IOException
@@ -93,15 +99,7 @@ public class Client
         //establish the socket connection
         Socket socket = new Socket(ipAddress, serverPort);
 
-        //initiating input and out streams
-        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-
-        sendMessage(outputStream, input, socket);
-
-        readMessage(inputStream, socket);
-
-        imAlive(outputStream);
+        initializerSetup(socket, input);
     }
 
     private static void sendMessage(DataOutputStream outputStream, Scanner scanner, Socket socket)
@@ -192,7 +190,7 @@ public class Client
                     try
                     {
                         //puts thread to sleep for a specified amount of time
-                        Thread.sleep(50000);
+                        Thread.sleep(60000);
 
                         //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");
