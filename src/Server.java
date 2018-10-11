@@ -86,7 +86,8 @@ class ClientHandler implements Runnable
         //variable for receiving message
         String received;
 
-        boolean isTrue = true;
+        boolean clientHandlerRunning = true;
+
         try
         {
             nameClient();
@@ -94,15 +95,15 @@ class ClientHandler implements Runnable
         catch (IOException ioEx)
         {
             ioEx.printStackTrace();
-        }
 
+        }
 
         //thread to check if clients is alive
         CountDown countDown = new CountDown();
         Thread thread = new Thread(countDown);
         thread.start();
 
-        while(isTrue)
+        while(clientHandlerRunning)
         {
             try
             {
@@ -110,21 +111,38 @@ class ClientHandler implements Runnable
 
                 if(!checkImAlive(received, countDown))
                 {
-                    isTrue = false;
+                    clientHandlerRunning = false;
                 }
 
                 if (!checkMessage(received))
                 {
-                    isTrue = false;
+                    clientHandlerRunning = false;
                 }
-
-
 
             }
             catch (IOException ioEx)
             {
                 ioEx.printStackTrace();
+
+                try
+                {
+                    Server.clientList.remove(this);
+
+                    alertUsersOfChanges(Server.clientList, outputStream);
+
+                    socket.close();
+
+                    countDown.setOn(false);
+
+                    clientHandlerRunning = false;
+
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
             }
+
         }
 
 
@@ -133,6 +151,7 @@ class ClientHandler implements Runnable
         //closing resources for safety
         try
         {
+            countDown.setOn(false);
             System.out.println("closed connection");
             this.inputStream.close();
             this.outputStream.close();
@@ -167,11 +186,11 @@ class ClientHandler implements Runnable
 
     private void nameClient() throws IOException
     {
-        boolean isTrue = true;
+        boolean isBeingNamed = true;
 
         String received = inputStream.readUTF();
 
-        while (isTrue)
+        while (isBeingNamed)
         {
 
             try
@@ -196,7 +215,7 @@ class ClientHandler implements Runnable
                     //imav is treated as a bad command and loop starts over
                     if(nameNew.equalsIgnoreCase("imav") || b || (nameNew.length() == 0) || (nameNew.length() > 12))
                     {
-                        outputStream.writeUTF("502: Bad command");
+                        outputStream.writeUTF("J_ER 502: Bad command");
 
                         nameNew = "";
 
@@ -207,7 +226,7 @@ class ClientHandler implements Runnable
                     //gives duplicate username error to user and loop starts over
                     if(handler.getUsername().equals(nameNew))
                     {
-                        outputStream.writeUTF("401: Duplicate username");
+                        outputStream.writeUTF("J_ER 401: Duplicate username");
 
                         nameNew = "";
 
@@ -230,12 +249,21 @@ class ClientHandler implements Runnable
                     alertUsersOfChanges(Server.clientList, outputStream);
 
                     //breaks out of loop when username is ok
-                    isTrue = false;
+                    isBeingNamed = false;
 
                 }
-            }catch (IOException e)
+            }
+            catch (IOException ioEx)
             {
-                e.printStackTrace();
+                ioEx.printStackTrace();
+
+                Server.clientList.remove(this);
+
+                alertUsersOfChanges(Server.clientList, outputStream);
+
+                socket.close();
+
+                isBeingNamed = false;
             }
 
         }
