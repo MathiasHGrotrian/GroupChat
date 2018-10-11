@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Client
 {
-    public static void main(String args[]) throws IOException, UnknownHostException
+    public static void main(String args[])
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -41,39 +41,56 @@ public class Client
 
     }
 
-    private static void initializerSetup(Socket socket, Scanner scanner, DataOutputStream outputStream) throws IOException
+    private static void initializerSetup(Socket socket, Scanner scanner, DataOutputStream outputStream)
     {
-        //initializing inputstream
-        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+        try
+        {
+            //initializing inputstream
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
 
-        sendMessage(outputStream, scanner, socket);
+            sendMessage(outputStream, scanner, socket);
 
-        readMessage(inputStream, socket);
+            readMessage(inputStream, socket);
 
-        imAlive(outputStream);
+            imAlive(outputStream);
+        }
+        catch (IOException ioEx)
+        {
+            ioEx.printStackTrace();
+            System.out.println("IN INITSETUP");
+        }
     }
 
-    private static void localHostServer() throws IOException
+    private static void localHostServer()
     {
         Scanner scanner = new Scanner(System.in);
 
         int serverPort = 1234;
 
-        //setting localhost as ip address
-        InetAddress ipAddress = InetAddress.getByName("localhost");
+        try
+        {
+            //setting localhost as ip address
+            InetAddress ipAddress = InetAddress.getByName("localhost");
 
-        //establish the socket connection
-        Socket socket = new Socket(ipAddress, serverPort);
+            //establish the socket connection
+            Socket socket = new Socket(ipAddress, serverPort);
 
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-        outputStream.writeUTF("");
+            outputStream.writeUTF("");
 
-        initializerSetup(socket, scanner, outputStream);
+            initializerSetup(socket, scanner, outputStream);
+        }
+        catch (IOException ioEx)
+        {
+            ioEx.printStackTrace();
+
+            System.out.println("IN LOCALHOSTSERVER");
+        }
 
     }
 
-    private static void customServer() throws IOException
+    private static void customServer()
     {
         //string for storing storing the server ip
         String ip;
@@ -96,17 +113,26 @@ public class Client
         //done to prevent duplicate username error when user is prompted for username
         Scanner input = new Scanner(System.in);
 
-        //setting localhost as ip address
-        InetAddress ipAddress = InetAddress.getByName(ip);
+        try
+        {
+            //setting localhost as ip address
+            InetAddress ipAddress = InetAddress.getByName(ip);
 
-        //establish the socket connection
-        Socket socket = new Socket(ipAddress, serverPort);
+            //establish the socket connection
+            Socket socket = new Socket(ipAddress, serverPort);
 
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-        outputStream.writeUTF( ", " + ip + " : " + serverPort);
+            outputStream.writeUTF(", " + ip + " : " + serverPort);
 
-        initializerSetup(socket, input, outputStream);
+            initializerSetup(socket, input, outputStream);
+        }
+        catch (IOException ioEx)
+        {
+            ioEx.printStackTrace();
+
+            System.out.println("IN CUSTOMSERVER");
+        }
     }
 
     private static void sendMessage(DataOutputStream outputStream, Scanner scanner, Socket socket)
@@ -116,7 +142,9 @@ public class Client
             @Override
             public void run()
             {
-                while (true)
+                boolean isSendingMessages = true;
+
+                while (isSendingMessages)
                 {
                     //sets the message to users input from scanner
                     String message = scanner.nextLine();
@@ -138,6 +166,9 @@ public class Client
                     } catch (IOException e)
                     {
                         e.printStackTrace();
+
+                        System.out.println("IN SENDMESSAGE");
+
                     }
                 }
             }
@@ -173,9 +204,21 @@ public class Client
                             System.exit(1);
                         }
 
-                    } catch (IOException e)
+                    } catch (IOException ioEx)
                     {
-                        e.printStackTrace();
+                        ioEx.printStackTrace();
+
+                        try
+                        {
+                            System.out.println("J_ER 503: Server shut down");
+
+                            socket.close();
+
+                            System.exit(1);
+                        } catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -208,6 +251,7 @@ public class Client
                     } catch (IOException ioEx)
                     {
                         ioEx.printStackTrace();
+
                     }
                 }
 
