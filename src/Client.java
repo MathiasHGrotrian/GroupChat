@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Client
 {
@@ -89,44 +91,70 @@ public class Client
 
     private static void customServer()
     {
-        //string for storing storing the server ip
-        String ip;
-
-        //int for storing the serverport
-        int serverPort;
-
         //scanner used for getting server ip and port from user
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Please enter the IP address of the server you would like to connect to.");
-
-        ip = scanner.nextLine();
-
-        System.out.println("Please enter the serverport number");
-
-        serverPort = scanner.nextInt();
-
-        //new scanner to be passed as argument in sendMessage method
-        //done to prevent duplicate username error when user is prompted for username
-        Scanner input = new Scanner(System.in);
-
-        try
+        while(true)
         {
-            //setting localhost as ip address
-            InetAddress ipAddress = InetAddress.getByName(ip);
+            //string for storing storing the server ip
+            String ip;
 
-            //establish the socket connection
-            Socket socket = new Socket(ipAddress, serverPort);
+            //int for storing the serverport
+            String serverPort;
 
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            System.out.println("Please enter the IP address of the server you would like to connect to.");
 
-            outputStream.writeUTF(", " + ip + " : " + serverPort);
+            ip = scanner.nextLine();
 
-            initializerSetup(socket, input, outputStream);
-        }
-        catch (IOException ioEx)
-        {
-            System.out.println("J_ER 500: Other error");
+            Pattern IPPattern = Pattern.compile("[^0-9.]");
+
+            Matcher IPMatcher = IPPattern.matcher(ip);
+
+            boolean IPIsValid = IPMatcher.find();
+
+            System.out.println("Please enter the serverport number");
+
+            serverPort = scanner.nextLine();
+
+            Pattern portPattern = Pattern.compile("[^0-9]");
+
+            Matcher portMatcher = portPattern.matcher(serverPort);
+
+            boolean portIsValid = portMatcher.find();
+
+            if(!IPIsValid && !portIsValid && serverPort.length() == 4)
+            {
+                //new scanner to be passed as argument in sendMessage method
+                //done to prevent duplicate username error when user is prompted for username
+                Scanner input = new Scanner(System.in);
+
+                try
+                {
+                    //setting localhost as ip address
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+
+                    int serverPortInt = Integer.parseInt(serverPort);
+
+                    //establish the socket connection
+                    Socket socket = new Socket(ipAddress, serverPortInt);
+
+                    DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+                    outputStream.writeUTF(", " + ip + " : " + serverPort);
+
+                    initializerSetup(socket, input, outputStream);
+
+                    break;
+
+                } catch (IOException ioEx)
+                {
+                    System.out.println("J_ER 500: Other error");
+                }
+
+            }
+
+            System.out.println("J_ER 505: Invalid IP address or port number");
+
         }
     }
 
@@ -201,16 +229,16 @@ public class Client
                             outputStream.writeUTF("J_OK");
                         }
 
-                    } catch (IOException ioEx)
+                    }
+                    catch (IOException ioEx)
                     {
                         try
                         {
-                            System.out.println("J_ER 503: Server shut down");
-
                             socket.close();
 
                             System.exit(1);
-                        } catch (IOException e)
+                        }
+                        catch (IOException e)
                         {
                             System.out.println("J_ER 503: Server shut down");
                         }

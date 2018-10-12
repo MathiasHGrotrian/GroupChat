@@ -142,14 +142,10 @@ class ClientHandler implements Runnable
 
         }
 
-
-        System.out.println("connection closed");
-
         //closing resources for safety
         try
         {
             countDown.setOn(false);
-            System.out.println("closed connection");
             this.inputStream.close();
             this.outputStream.close();
 
