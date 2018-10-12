@@ -50,14 +50,13 @@ public class Client
 
             sendMessage(outputStream, scanner, socket);
 
-            readMessage(inputStream, socket);
+            readMessage(inputStream, socket, outputStream);
 
             imAlive(outputStream);
         }
         catch (IOException ioEx)
         {
-            ioEx.printStackTrace();
-            System.out.println("IN INITSETUP");
+            System.out.println("J_ER 500: Other error");
         }
     }
 
@@ -83,9 +82,7 @@ public class Client
         }
         catch (IOException ioEx)
         {
-            ioEx.printStackTrace();
-
-            System.out.println("IN LOCALHOSTSERVER");
+            System.out.println("J_ER 500: Other error");
         }
 
     }
@@ -129,9 +126,7 @@ public class Client
         }
         catch (IOException ioEx)
         {
-            ioEx.printStackTrace();
-
-            System.out.println("IN CUSTOMSERVER");
+            System.out.println("J_ER 500: Other error");
         }
     }
 
@@ -165,10 +160,7 @@ public class Client
                         }
                     } catch (IOException e)
                     {
-                        e.printStackTrace();
-
-                        System.out.println("IN SENDMESSAGE");
-
+                        System.out.println("J_ER 503: Server shut down");
                     }
                 }
             }
@@ -179,7 +171,7 @@ public class Client
         sendMessage.start();
     }
 
-    private static void readMessage(DataInputStream inputStream, Socket socket)
+    private static void readMessage(DataInputStream inputStream, Socket socket, DataOutputStream outputStream)
     {
         //thread for reading messages
         Thread readMessage = new Thread(new Runnable()
@@ -204,10 +196,13 @@ public class Client
                             System.exit(1);
                         }
 
+                        if(message.equals("J_OK"))
+                        {
+                            outputStream.writeUTF("J_OK");
+                        }
+
                     } catch (IOException ioEx)
                     {
-                        ioEx.printStackTrace();
-
                         try
                         {
                             System.out.println("J_ER 503: Server shut down");
@@ -217,7 +212,7 @@ public class Client
                             System.exit(1);
                         } catch (IOException e)
                         {
-                            e.printStackTrace();
+                            System.out.println("J_ER 503: Server shut down");
                         }
                     }
                 }
@@ -247,10 +242,11 @@ public class Client
 
                     } catch (InterruptedException iEx)
                     {
-                        iEx.printStackTrace();
-                    } catch (IOException ioEx)
+                        System.out.println("J_ER 503: Server shut down");
+                    }
+                    catch (IOException ioEx)
                     {
-                        ioEx.printStackTrace();
+                        System.out.println("J_ER 503: Server shut down");
 
                     }
                 }

@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7aa75595-d2ef-48da-8de7-78f0db2387bc" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -37,14 +38,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-106">
-              <caret line="187" column="4" lean-forward="true" selection-start-line="187" selection-start-column="4" selection-end-line="187" selection-end-column="4" />
+            <state relative-caret-position="158">
+              <caret line="80" column="22" selection-start-line="80" selection-start-column="22" selection-end-line="80" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#run#0;class#ClientHandler#0" />
                 <element signature="method#listToString#0;class#ClientHandler#0" />
+                <element signature="method#nameClient#0;class#ClientHandler#0" />
                 <element signature="method#checkImAlive#0;class#ClientHandler#0" />
                 <element signature="method#checkMessage#0;class#ClientHandler#0" />
               </folding>
@@ -64,18 +67,18 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Client.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="230" column="4" selection-start-line="230" selection-start-column="4" selection-end-line="230" selection-end-column="4" />
+            <state relative-caret-position="518">
+              <caret line="204" column="21" selection-start-line="204" selection-start-column="21" selection-end-line="204" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#main#0;class#Client#0" />
                 <element signature="method#initializerSetup#0;class#Client#0" />
                 <element signature="method#localHostServer#0;class#Client#0" />
                 <element signature="method#customServer#0;class#Client#0" />
                 <element signature="method#sendMessage#0;class#Client#0" />
-                <element signature="method#readMessage#0;class#Client#0" />
                 <element signature="method#imAlive#0;class#Client#0" />
               </folding>
             </state>
@@ -91,6 +94,11 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>printst</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -98,8 +106,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/CountDown.java" />
-        <option value="$PROJECT_DIR$/src/Server.java" />
         <option value="$PROJECT_DIR$/src/Client.java" />
+        <option value="$PROJECT_DIR$/src/Server.java" />
       </list>
     </option>
   </component>
@@ -133,6 +141,12 @@
               <item name="GroupChat" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="GroupChat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="GroupChat" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Server.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -142,6 +156,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SearchEverywhereHistoryKey" value="printStackTrace&#9;null&#9;null" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1539086186252" />
@@ -229,8 +244,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Client" />
         <item itemvalue="Application.Server" />
+        <item itemvalue="Application.Client" />
       </list>
     </recent_temporary>
   </component>
@@ -247,12 +262,12 @@
       <workItem from="1538638069967" duration="6297000" />
       <workItem from="1538721155838" duration="23096000" />
       <workItem from="1539081618902" duration="4818000" />
-      <workItem from="1539170706596" duration="18878000" />
+      <workItem from="1539170706596" duration="21863000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53089000" />
+    <option name="totallyTimeSpent" value="56074000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="713" extended-state="0" />
@@ -266,7 +281,7 @@
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.514867" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.5195618" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32893288" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info id="Capture Tool" order="5" />
@@ -296,7 +311,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="3" />
+      <option name="time" value="5" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -306,7 +321,9 @@
           <caret line="265" column="9" selection-start-line="265" selection-start-column="9" selection-end-line="265" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#ClientHandler#0" />
             <element signature="method#listToString#0;class#ClientHandler#0" />
+            <element signature="method#nameClient#0;class#ClientHandler#0" />
             <element signature="method#checkImAlive#0;class#ClientHandler#0" />
             <element signature="method#checkMessage#0;class#ClientHandler#0" />
           </folding>
@@ -329,11 +346,11 @@
           <caret line="69" column="69" lean-forward="true" selection-start-line="69" selection-start-column="69" selection-end-line="69" selection-end-column="69" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#Client#0" />
             <element signature="method#initializerSetup#0;class#Client#0" />
             <element signature="method#localHostServer#0;class#Client#0" />
             <element signature="method#customServer#0;class#Client#0" />
             <element signature="method#sendMessage#0;class#Client#0" />
-            <element signature="method#readMessage#0;class#Client#0" />
             <element signature="method#imAlive#0;class#Client#0" />
           </folding>
         </state>
@@ -349,31 +366,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-106">
-          <caret line="187" column="4" lean-forward="true" selection-start-line="187" selection-start-column="4" selection-end-line="187" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#listToString#0;class#ClientHandler#0" />
-            <element signature="method#checkImAlive#0;class#ClientHandler#0" />
-            <element signature="method#checkMessage#0;class#ClientHandler#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="230" column="4" selection-start-line="230" selection-start-column="4" selection-end-line="230" selection-end-column="4" />
+        <state relative-caret-position="518">
+          <caret line="204" column="21" selection-start-line="204" selection-start-column="21" selection-end-line="204" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#Client#0" />
             <element signature="method#initializerSetup#0;class#Client#0" />
             <element signature="method#localHostServer#0;class#Client#0" />
             <element signature="method#customServer#0;class#Client#0" />
             <element signature="method#sendMessage#0;class#Client#0" />
-            <element signature="method#readMessage#0;class#Client#0" />
             <element signature="method#imAlive#0;class#Client#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="80" column="22" selection-start-line="80" selection-start-column="22" selection-end-line="80" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#ClientHandler#0" />
+            <element signature="method#listToString#0;class#ClientHandler#0" />
+            <element signature="method#nameClient#0;class#ClientHandler#0" />
+            <element signature="method#checkImAlive#0;class#ClientHandler#0" />
+            <element signature="method#checkMessage#0;class#ClientHandler#0" />
           </folding>
         </state>
       </provider>

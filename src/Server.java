@@ -28,9 +28,6 @@ public class Server
             //accept the incoming request and listen for clients trying to connect on socket
             socket = serverSocket.accept();
 
-            //Vi sletter dig senere!!!!
-            System.out.println("J_OK");
-
             //initiate input and output streams
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -94,8 +91,7 @@ class ClientHandler implements Runnable
         }
         catch (IOException ioEx)
         {
-            ioEx.printStackTrace();
-
+            System.out.println("J_ER 500: Other error");
         }
 
         //thread to check if clients is alive
@@ -122,7 +118,7 @@ class ClientHandler implements Runnable
             }
             catch (IOException ioEx)
             {
-                ioEx.printStackTrace();
+                System.out.println("J_ER 500: Other error");
 
                 try
                 {
@@ -136,9 +132,10 @@ class ClientHandler implements Runnable
 
                     clientHandlerRunning = false;
 
-                } catch (IOException e)
+                }
+                catch (IOException e)
                 {
-                    e.printStackTrace();
+                    System.out.println("J_ER 500: Other error");
                 }
 
             }
@@ -158,7 +155,7 @@ class ClientHandler implements Runnable
 
         } catch(IOException e)
         {
-            e.printStackTrace();
+            System.out.println("J_ER 500: Other error");
         }
 
     }
@@ -173,12 +170,12 @@ class ClientHandler implements Runnable
         {
             if(clienthandler.getUsername().length() != 0)
             {
-                listOfClients += clienthandler.getUsername() + "\n";
+                listOfClients += clienthandler.getUsername() + " ";
             }
         }
         for(ClientHandler clientHandler : clientHandlers)
         {
-            clientHandler.outputStream.writeUTF("UPDATED LIST OF ACTIVE USERS: \n"
+            clientHandler.outputStream.writeUTF("LIST "
                     + listOfClients);
         }
 
@@ -239,11 +236,18 @@ class ClientHandler implements Runnable
                 {
                     setUsername(nameNew);
 
+                    //prints a join message to the server with username
+                    //start of threeway handshake, syn
+                    System.out.println("JOIN " + username + received);
+
+                    //middle of threeway handshake, send syn/ack
                     outputStream.writeUTF("J_OK");
 
-                    //prints a join message to the server with username
-                    //MAY NEED TO ADD PORT NUMBER AND IP ADDRESS TO JOIN MESSAGE
-                    System.out.println("JOIN " + username + received);
+                    //receive ack
+                    String ack = inputStream.readUTF();
+
+                    //end of threeway handshake, print out ack
+                    System.out.println(ack);
 
                     //prints list of clienthandlers as clienthandler has been succesfully named and added to list
                     alertUsersOfChanges(Server.clientList, outputStream);
@@ -255,7 +259,7 @@ class ClientHandler implements Runnable
             }
             catch (IOException ioEx)
             {
-                ioEx.printStackTrace();
+                System.out.println("J_ER 504: Client disconnected unexpectedly");
 
                 Server.clientList.remove(this);
 
@@ -319,6 +323,13 @@ class ClientHandler implements Runnable
             this.socket.close();
 
             return false;
+        }
+
+        if(received.equalsIgnoreCase("j_ok"))
+        {
+            outputStream.writeUTF("J_ER 502: Bad command");
+
+            return true;
         }
 
         if(!received.equalsIgnoreCase("imav"))
