@@ -43,6 +43,7 @@ public class Client
 
     }
 
+    //sets up inputstream and socket and starts threads
     private static void initializerSetup(Socket socket, Scanner scanner, DataOutputStream outputStream)
     {
         try
@@ -62,6 +63,7 @@ public class Client
         }
     }
 
+    //set up for local server
     private static void localHostServer()
     {
         Scanner scanner = new Scanner(System.in);
@@ -89,6 +91,7 @@ public class Client
 
     }
 
+    //set up for custom server
     private static void customServer()
     {
         //scanner used for getting server ip and port from user
@@ -102,27 +105,50 @@ public class Client
             //int for storing the serverport
             String serverPort;
 
-            System.out.println("Please enter the IP address of the server you would like to connect to.");
+            System.out.println("Please enter the IPv4 address of the server you would like to connect to.");
 
             ip = scanner.nextLine();
 
-            Pattern IPPattern = Pattern.compile("[^0-9.]");
+            //pattern for validating ipv4 addresses
+            //found on stack overflow, link below
+            //https://stackoverflow.com/questions/5667371/validate-ipv4-address-in-java
+            Pattern IPPattern =
+                    Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
+            //matcher for the ip pattern
             Matcher IPMatcher = IPPattern.matcher(ip);
 
+            //boolean used to check if a match is found
             boolean IPIsValid = IPMatcher.find();
 
-            System.out.println("Please enter the serverport number");
+            System.out.println("Please enter the serverport number.");
 
             serverPort = scanner.nextLine();
 
-            Pattern portPattern = Pattern.compile("[^0-9]");
+            //pattern used to make sure only digits are entered
+            Pattern portPattern = Pattern.compile("[\\d]");
 
             Matcher portMatcher = portPattern.matcher(serverPort);
 
             boolean portIsValid = portMatcher.find();
 
-            if(!IPIsValid && !portIsValid && serverPort.length() == 4)
+            //stores the port number in an integer so it can be used to set up socket
+            int serverPortInt = 0;
+
+            //checks if entered port matches pattern and parses the string to an int if true
+            if(portIsValid)
+            {
+                serverPortInt = Integer.parseInt(serverPort);
+
+                //checks if serverport is within proper range and sets portIsValid to false if not
+                if (!checkServerPort(serverPortInt,serverPort))
+                {
+                    portIsValid = false;
+                }
+            }
+
+            //checks if all inputs are valid and sets up connection if true
+            if(IPIsValid && portIsValid)
             {
                 //new scanner to be passed as argument in sendMessage method
                 //done to prevent duplicate username error when user is prompted for username
@@ -133,13 +159,13 @@ public class Client
                     //setting localhost as ip address
                     InetAddress ipAddress = InetAddress.getByName(ip);
 
-                    int serverPortInt = Integer.parseInt(serverPort);
-
                     //establish the socket connection
                     Socket socket = new Socket(ipAddress, serverPortInt);
 
+                    //set up outputstream
                     DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
+                    //send information to be used in join message to server
                     outputStream.writeUTF(", " + ip + " : " + serverPort);
 
                     initializerSetup(socket, input, outputStream);
@@ -148,16 +174,48 @@ public class Client
 
                 } catch (IOException ioEx)
                 {
-                    System.out.println("J_ER 500: Other error");
+                    System.out.println("J_ER 506: Can't connect to server. \n" +
+                            "Make sure you have the right IPv4 address and port number\n");
                 }
 
             }
 
-            System.out.println("J_ER 505: Invalid IP address or port number");
+            //help messages if input isn't valid
+            if(!IPIsValid && !portIsValid)
+            {
+                System.out.println("J_ER 509: Invalid IP address and serverport number\n" +
+                        "Please make sure you are using an IPv4 address and the format: 0-255.0-255.0-255.0-255\n" +
+                        "Please use a port number between 1023 - 65535\n");
+            }
+
+            else if(!IPIsValid)
+            {
+                System.out.println("J_ER 507: Invalid IP address\n" +
+                        "Please make sure you are using an IPv4 address and the format: 0-255.0-255.0-255.0-255\n");
+            }
+
+            else if(!portIsValid)
+            {
+                System.out.println("J_ER 508: Invalid serverport number\n" +
+                        "Please use a port number between 1023-65535\n");
+            }
+
 
         }
     }
 
+    //checks if serverport number is within range
+    private static boolean checkServerPort(int serverPortInt, String serverPort)
+    {
+        if (serverPortInt >= 1023 && serverPortInt <= 65535 && serverPort.length() >= 4 && serverPort.length() <=5)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    //starts a thread for sending messages to other clients
     private static void sendMessage(DataOutputStream outputStream, Scanner scanner, Socket socket)
     {
         Thread sendMessage = new Thread(new Runnable()
@@ -199,6 +257,7 @@ public class Client
         sendMessage.start();
     }
 
+    //starts a thread for reading messages from other clients and the server
     private static void readMessage(DataInputStream inputStream, Socket socket, DataOutputStream outputStream)
     {
         //thread for reading messages
@@ -250,6 +309,7 @@ public class Client
         readMessage.start();
     }
 
+    //starts a thread which sends out a heartbeat to the server every 60 seconds
     private static void imAlive(DataOutputStream outputStream)
     {
         //thread for sending I'm alive messages each time 60 seconds have passed

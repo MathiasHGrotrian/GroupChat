@@ -4,7 +4,6 @@ import java.net.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// Server class
 public class Server
 {
     // ArrayList to store active clients
@@ -48,7 +47,6 @@ public class Server
 
 }
 
-//ClientHandler class
 class ClientHandler implements Runnable
 {
     //variables
@@ -171,8 +169,20 @@ class ClientHandler implements Runnable
         }
         for(ClientHandler clientHandler : clientHandlers)
         {
-            clientHandler.outputStream.writeUTF("LIST "
-                    + listOfClients);
+            try
+            {
+                clientHandler.outputStream.writeUTF("LIST "
+                        + listOfClients);
+            } catch (IOException ioEx)
+            {
+                System.out.println("J_ER 504: Client disconnected unexpectedly");
+
+                Server.clientList.remove(this);
+
+                alertUsersOfChanges(Server.clientList, outputStream);
+
+                socket.close();
+            }
         }
 
     }
@@ -197,61 +207,11 @@ class ClientHandler implements Runnable
                 //receive a string, nameNew
                 nameNew = inputStream.readUTF();
 
-                Pattern p = Pattern.compile("[^a-z0-9_-]", Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher(nameNew);
-                boolean b = m.find();
+                Pattern namePattern = Pattern.compile("[^a-z0-9_-]", Pattern.CASE_INSENSITIVE);
+                Matcher nameMatcher = namePattern.matcher(nameNew);
+                boolean isValidName = nameMatcher.find();
 
-                //for each loop to run through list of clienthandlers
-                for(ClientHandler handler : Server.clientList)
-                {
-                    //checks to make sure client hasn't entered imav as name
-                    //imav is treated as a bad command and loop starts over
-                    if(nameNew.equalsIgnoreCase("imav") || b || (nameNew.length() == 0) || (nameNew.length() > 12))
-                    {
-                        outputStream.writeUTF("J_ER 502: Bad command");
-
-                        nameNew = "";
-
-                        break;
-                    }
-
-                    //checks if any clienthandlers already have the username entered by the user
-                    //gives duplicate username error to user and loop starts over
-                    if(handler.getUsername().equals(nameNew))
-                    {
-                        outputStream.writeUTF("J_ER 401: Duplicate username");
-
-                        nameNew = "";
-
-                        break;
-                    }
-                }
-
-                //performs checks to length of entered username to make sure it fits restrictions
-                if(!(nameNew.length() == 0) && !(nameNew.length() > 12))
-                {
-                    setUsername(nameNew);
-
-                    //prints a join message to the server with username
-                    //start of threeway handshake, syn
-                    System.out.println("JOIN " + username + received);
-
-                    //middle of threeway handshake, send syn/ack
-                    outputStream.writeUTF("J_OK");
-
-                    //receive ack
-                    String ack = inputStream.readUTF();
-
-                    //end of threeway handshake, print out ack
-                    System.out.println(ack);
-
-                    //prints list of clienthandlers as clienthandler has been succesfully named and added to list
-                    alertUsersOfChanges(Server.clientList, outputStream);
-
-                    //breaks out of loop when username is ok
-                    isBeingNamed = false;
-
-                }
+                isBeingNamed = checkName(nameNew, received, isValidName);
             }
             catch (IOException ioEx)
             {
@@ -269,10 +229,91 @@ class ClientHandler implements Runnable
         }
     }
 
+    private boolean checkName(String nameNew, String received, boolean nameIsValid)
+    {
+        try
+        {
+            //for each loop to run through list of clienthandlers
+            for(ClientHandler handler : Server.clientList)
+            {
+                //checks to make sure client hasn't entered imav as name
+                //imav is treated as a bad command and loop starts over
+                if(nameNew.equalsIgnoreCase("imav") || nameNew.equalsIgnoreCase("quit")
+                        || nameIsValid || (nameNew.length() == 0) || (nameNew.length() > 12))
+                {
+                    outputStream.writeUTF("J_ER 502: Bad command");
+
+                    nameNew = "";
+
+                    break;
+                }
+
+                //checks if any clienthandlers already have the username entered by the user
+                //gives duplicate username error to user and loop starts over
+                if(handler.getUsername().equals(nameNew))
+                {
+                    outputStream.writeUTF("J_ER 401: Duplicate username");
+
+                    nameNew = "";
+
+                    break;
+                }
+            }
+
+            //performs checks to length of entered username to make sure it fits restrictions
+            if(!(nameNew.length() == 0) && !(nameNew.length() > 12))
+            {
+                setUsername(nameNew);
+
+                //prints a join message to the server with username
+                //start of threeway handshake, syn
+                System.out.println("JOIN " + username + received);
+
+                //middle of threeway handshake, send syn/ack
+                outputStream.writeUTF("J_OK");
+
+                //receive ack
+                String ack = inputStream.readUTF();
+
+                //end of threeway handshake, print out ack
+                System.out.println(ack);
+
+                //prints list of clienthandlers as clienthandler has been succesfully named and added to list
+                alertUsersOfChanges(Server.clientList, outputStream);
+
+                //breaks out of loop when username is ok
+                 return false;
+
+            }
+        }
+        catch (IOException ioEx)
+        {
+            System.out.println("J_ER 504: Client disconnected unexpectedly");
+
+            Server.clientList.remove(this);
+
+            try
+            {
+                alertUsersOfChanges(Server.clientList, outputStream);
+
+                socket.close();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    //checks if clients have sent heartbeats and terminates their connection if they haven't
     private boolean checkImAlive(String received, CountDown countDown) throws IOException
     {
             //checks is client is alive, if not stop while loop and close socket
-            if (countDown.getSecondsPassed() >= 70)
+            //given a margin of 5 seconds
+            if (countDown.getSecondsPassed() >= 65)
             {
                 //stop timer in countdown
                 countDown.setOn(false);
@@ -280,16 +321,29 @@ class ClientHandler implements Runnable
                 //removes clienthandler from the list of clienthandlers currently connected to server
                 Server.clientList.remove(this);
 
-                //prints a list of every clienthandler connected to the server, to every client
-                alertUsersOfChanges(Server.clientList,outputStream);
+                try
+                {
+                    //prints a list of every clienthandler connected to the server, to every client
+                    alertUsersOfChanges(Server.clientList, outputStream);
 
-                System.out.println("QUIT " + username);
+                    System.out.println("QUIT " + username);
 
-                //to quit client
-                outputStream.writeUTF("QUIT");
-                this.socket.close();
+                    //to quit client
+                    outputStream.writeUTF("QUIT");
+                    this.socket.close();
 
-                return false;
+                    return false;
+                }
+                catch (IOException ioEx)
+                {
+                    System.out.println("J_ER 504: Client disconnected unexpectedly");
+
+                    Server.clientList.remove(this);
+
+                    alertUsersOfChanges(Server.clientList, outputStream);
+
+                    socket.close();
+                }
             }
 
             if(received.equalsIgnoreCase("IMAV"))
@@ -301,12 +355,12 @@ class ClientHandler implements Runnable
 
     }
 
+    //checks contents of messages and responds depending on the contents
     private boolean checkMessage(String received) throws IOException
     {
         //quit statement
         if(received.equals("QUIT"))
         {
-
             //removes clienthandler from the list of clienthandlers currently connected to server
             Server.clientList.remove(this);
 
@@ -321,6 +375,7 @@ class ClientHandler implements Runnable
             return false;
         }
 
+        //prevents users from sending acknowledgement messages to each other
         if(received.equalsIgnoreCase("j_ok"))
         {
             outputStream.writeUTF("J_ER 502: Bad command");
@@ -328,6 +383,13 @@ class ClientHandler implements Runnable
             return true;
         }
 
+        sendMessages(received);
+        return true;
+    }
+
+    //sends messages to all connected clients
+    private void sendMessages(String received) throws IOException
+    {
         if(!received.equalsIgnoreCase("imav"))
         {
             //sending message to other clients using a for each loop
@@ -341,6 +403,5 @@ class ClientHandler implements Runnable
                 }
             }
         }
-        return true;
     }
 }
