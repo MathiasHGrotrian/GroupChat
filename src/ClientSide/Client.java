@@ -8,39 +8,37 @@ public class Client
 {
     public static void main(String args[])
     {
-        Scanner scanner = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Please choose an option\n" +
-                "1. Local host server\n" +
-                "2. Custom server");
+            System.out.println("Please choose an option\n" +
+                    "1. Local host server\n" +
+                    "2. Custom server");
 
-        String serverOption = scanner.nextLine();
+            String serverOption = scanner.nextLine();
 
-        switch (serverOption)
-        {
-            case "1":
+            switch (serverOption)
             {
-                localHostServer();
+                case "1":
+                {
+                    localHostServer();
 
-                break;
+                    break;
+                }
+
+                case "2":
+                {
+                    customServer();
+
+                    break;
+                }
+
+                default:
+                {
+                    System.out.println("J_ER 501: Unknown command");
+
+                    break;
+                }
             }
-
-            case "2":
-            {
-                customServer();
-
-                break;
-            }
-
-            default:
-            {
-                System.out.println("501 : Unknown command");
-
-                break;
-            }
-        }
-
-
     }
 
     //sets up inputstream and socket and starts threads
@@ -94,39 +92,57 @@ public class Client
     //set up for custom server
     private static void customServer()
     {
+        IPv4Validator iPv4Validator = new IPv4Validator();
+
+        PortValidator portValidator = new PortValidator();
+
         //scanner used for getting server ip and port from user
         Scanner scanner = new Scanner(System.in);
 
         while(true)
         {
             //string for storing storing the server ip
-            String ip;
+            String ip, serverPort;
 
             //int for storing the serverport
-            String serverPort;
+            //used when setting up socket
+            int serverPortInt;
+
+            boolean IPIsValid, portIsValid;
 
             System.out.println("Please enter the IPv4 address of the server you would like to connect to.");
 
             ip = scanner.nextLine();
 
+            IPIsValid = iPv4Validator.validateIP(ip);
+
             //pattern for validating ipv4 addresses
             //found on stack overflow, link below
             //https://stackoverflow.com/questions/5667371/validate-ipv4-address-in-java
-            Pattern IPPattern =
+            /*Pattern IPPattern =
                     Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
             //matcher for the ip pattern
             Matcher IPMatcher = IPPattern.matcher(ip);
 
             //boolean used to check if a match is found
-            boolean IPIsValid = IPMatcher.find();
+            boolean IPIsValid = IPMatcher.find();*/
 
             System.out.println("Please enter the serverport number.");
 
             serverPort = scanner.nextLine();
 
+            serverPortInt = portValidator.convertPortToInt(serverPort);
+
+            portIsValid = portValidator.validatePort(serverPort, serverPortInt);
+
+            if (portIsValid)
+            {
+                serverPortInt = portValidator.convertPortToInt(serverPort);
+            }
+
             //pattern used to make sure only digits are entered
-            Pattern portPattern = Pattern.compile("[\\d]");
+            /*Pattern portPattern = Pattern.compile("[\\d]");
 
             Matcher portMatcher = portPattern.matcher(serverPort);
 
@@ -145,7 +161,7 @@ public class Client
                 {
                     portIsValid = false;
                 }
-            }
+            }*/
 
             //checks if all inputs are valid and sets up connection if true
             if(IPIsValid && portIsValid)
@@ -196,7 +212,7 @@ public class Client
 
             else if(!portIsValid)
             {
-                System.out.println("J_ER 508: Invalid serverport number\n" +
+                System.out.println("J_ER 508: Invalid serverport number. No letters or symbols allowed\n" +
                         "Please use a port number between 1023-65535\n");
             }
 
@@ -280,6 +296,7 @@ public class Client
                         if(message.equals("QUIT"))
                         {
                             socket.close();
+
                             System.exit(1);
                         }
 
@@ -289,6 +306,7 @@ public class Client
                         }
 
                     }
+                    //in case of unexpected errors
                     catch (IOException ioEx)
                     {
                         try

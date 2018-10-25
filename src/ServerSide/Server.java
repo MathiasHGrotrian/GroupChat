@@ -114,6 +114,7 @@ class ClientHandler implements Runnable
                 }
 
             }
+            //in case of unexpected errors
             catch (IOException ioEx)
             {
                 System.out.println("J_ER 500: Other error");
@@ -191,6 +192,7 @@ class ClientHandler implements Runnable
     {
         boolean isBeingNamed = true;
 
+        //string for receiving server ip and port number
         String received = inputStream.readUTF();
 
         while (isBeingNamed)
@@ -282,7 +284,7 @@ class ClientHandler implements Runnable
                 alertUsersOfChanges(Server.clientList, outputStream);
 
                 //breaks out of loop when username is ok
-                 return false;
+                return false;
 
             }
         }
