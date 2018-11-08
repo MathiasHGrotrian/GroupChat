@@ -9,8 +9,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 
+//class for handling connection between client and server
 public class ClientHandler implements Runnable
 {
     //variables
@@ -18,8 +18,6 @@ public class ClientHandler implements Runnable
     private final DataInputStream inputStream;
     private final DataOutputStream outputStream;
     private Socket socket;
-    private ArrayList<ClientHandler> userList;
-    private Broadcaster broadcaster;
     private ClientNamer clientNamer;
     private MessageValidator messageValidator;
     private HeartBeatListener heartBeatListener;
@@ -31,8 +29,6 @@ public class ClientHandler implements Runnable
         this.outputStream = outputStream;
         this.socket = socket;
         this.username = "";
-        this.userList = new ArrayList<>();
-        this.broadcaster = Broadcaster.getBroadcaster();
         this.clientNamer = new ClientNamer();
         this.messageValidator = MessageValidator.getMessageValidator();
         this.heartBeatListener = new HeartBeatListener();
@@ -53,16 +49,12 @@ public class ClientHandler implements Runnable
 
     public DataOutputStream getOutputStream() { return outputStream; }
 
-    void setUserList(ArrayList<ClientHandler> userList)
-    {
-        this.userList = userList;
-    }
+    public DataInputStream getInputStream() { return inputStream; }
 
     @Override
     public void run() {
 
-        //list of clienthandlers stored i singleton
-        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
 
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
@@ -73,8 +65,7 @@ public class ClientHandler implements Runnable
 
         try
         {
-            clientNamer.nameClient(clientList, inputStream, outputStream, this);
-            //nameClient(clientList);
+            clientNamer.nameClient(this);
         }
         catch (IOException ioEx)
         {
@@ -92,12 +83,12 @@ public class ClientHandler implements Runnable
             {
                 received = inputStream.readUTF();
 
-                if(!heartBeatListener.checkImAlive(received, countDown, this, clientList))
+                if(!heartBeatListener.checkImAlive(received, countDown, this))
                 {
                     clientHandlerRunning = false;
                 }
 
-                if (!messageValidator.checkMessage(received, outputStream, this, clientList))
+                if (!messageValidator.checkMessage(received, this))
                 {
                     clientHandlerRunning = false;
                 }
@@ -110,13 +101,9 @@ public class ClientHandler implements Runnable
 
                 try
                 {
-                    clientList.remove(this);
+                    clientHandlerContainer.removeClient(this);
 
-                    broadcaster.alertUsersOfChanges();
-
-                    //alertUsersOfChanges(clientList, outputStream);
-
-                    socket.close();
+                    this.socket.close();
 
                     countDown.setOn(false);
 

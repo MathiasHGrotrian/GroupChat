@@ -11,8 +11,7 @@ import java.util.Scanner;
 class MessageSender
 {
     //starts a thread for sending messages to other clients
-    void sendMessages(DataOutputStream outputStream, Scanner scanner,
-                             Socket socket)
+    void sendMessages(DataOutputStream outputStream, Scanner scanner, Socket socket)
     {
         Thread sendMessage = new Thread(() ->
         {

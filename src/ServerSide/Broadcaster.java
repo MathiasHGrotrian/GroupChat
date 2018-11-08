@@ -26,9 +26,10 @@ public class Broadcaster
     }
 
     //sends messages to all connected clients
-    public void sendMessages(String received, ArrayList<ClientHandler> clientList,
-                             ClientHandler handler) throws IOException
+    public void sendMessages(String received, ClientHandler handler) throws IOException
     {
+        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
+
         //sending message to other clients using a for each loop
         for (ClientHandler clientHandler : clientList)
         {

@@ -2,6 +2,7 @@ package Validation;
 
 import ServerSide.Broadcaster;
 import ServerSide.ClientHandler;
+import Utilities.ClientHandlerContainer;
 import Utilities.ErrorPrinter;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,9 +30,13 @@ public class MessageValidator
     }
 
     //checks contents of messages and responds depending on the contents
-    public boolean checkMessage(String received, DataOutputStream outputStream,
-                                ClientHandler clientHandler, ArrayList<ClientHandler> clientList) throws IOException
+    public boolean checkMessage(String received, ClientHandler clientHandler) throws IOException
     {
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
+
+        ArrayList<ClientHandler> clientList = clientHandlerContainer.getClientHandlers();
+
+        DataOutputStream outputStream = clientHandler.getOutputStream();
 
         Broadcaster broadcaster = Broadcaster.getBroadcaster();
 
@@ -41,16 +46,13 @@ public class MessageValidator
         if(received.equals("QUIT"))
         {
             //removes clienthandler from the list of clienthandlers currently connected to server
-            clientList.remove(clientHandler);
+            clientHandlerContainer.removeClient(clientHandler);
 
+            //sends a message to every client informing them of the client quitting
             for(ClientHandler handler : clientList)
             {
                 handler.getOutputStream().writeUTF(clientHandler.getUsername() + " has quit");
             }
-
-            //prints a list of every clienthandler connected to the server, to every client
-            //is updated when a client disconnects from server
-            broadcaster.alertUsersOfChanges();
 
             System.out.println("QUIT " + clientHandler.getUsername());
 
@@ -71,7 +73,7 @@ public class MessageValidator
             return true;
         }
 
-        broadcaster.sendMessages(received, clientList, clientHandler);
+        broadcaster.sendMessages(received, clientHandler);
 
         return true;
     }

@@ -6,19 +6,21 @@ import Validation.NameValidator;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 //class used to name clienthandlers
 public class ClientNamer
 {
-    public void nameClient(ArrayList<ClientHandler> clientList, DataInputStream inputStream,
-                           DataOutputStream outputStream, ClientHandler handler) throws IOException
+    public void nameClient(ClientHandler clientHandler) throws IOException
     {
-        Broadcaster broadcaster = Broadcaster.getBroadcaster();
-
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
         NameValidator nameValidator = NameValidator.getNameValidator();
+
+        DataOutputStream outputStream = clientHandler.getOutputStream();
+
+        DataInputStream inputStream = clientHandler.getInputStream();
+
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
 
         boolean isBeingNamed = true;
 
@@ -42,13 +44,13 @@ public class ClientNamer
 
                 if(nameValidator.validateName(userName))
                 {
-                    if(nameValidator.checkName(userName, outputStream, handler, clientList))
+                    if(nameValidator.checkName(userName, clientHandler))
                     {
-                        handler.setUsername(userName);
+                        clientHandler.setUsername(userName);
 
                         //prints a join message to the server with username
                         //start of threeway handshake, syn
-                        System.out.println("JOIN " + handler.getUsername() + received);
+                        System.out.println("JOIN " + clientHandler.getUsername() + received);
 
                         //middle of threeway handshake, send syn/ack
                         outputStream.writeUTF("J_OK");
@@ -59,8 +61,7 @@ public class ClientNamer
                         //end of threeway handshake, print out ack
                         System.out.println(ack);
 
-                        //prints list of clienthandlers as clienthandler has been succesfully named and added to list
-                        broadcaster.alertUsersOfChanges();
+                        clientHandlerContainer.addClient(clientHandler);
 
                         //breaks out of loop when username is ok
                         isBeingNamed = false;
@@ -69,13 +70,11 @@ public class ClientNamer
             }
             catch (IOException ioEx)
             {
-                ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
-
                 errorPrinter.unexpectedClientShutdown();
 
-                clientHandlerContainer.removeClient(handler);
+                clientHandlerContainer.removeClient(clientHandler);
 
-                handler.getSocket().close();
+                clientHandler.getSocket().close();
 
                 isBeingNamed = false;
             }

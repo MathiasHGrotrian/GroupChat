@@ -1,8 +1,8 @@
 package Validation;
 
-import ServerSide.Broadcaster;
 import ServerSide.ClientHandler;
 import Strategy.NameValidationStrategy;
+import Utilities.ClientHandlerContainer;
 import Utilities.ErrorPrinter;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -41,10 +41,13 @@ public class NameValidator extends Validator
     }
 
 
-    public boolean checkName(String userName, DataOutputStream outputStream,
-                             ClientHandler clientHandler, ArrayList<ClientHandler> clientList)
+    public boolean checkName(String userName, ClientHandler clientHandler) throws IOException
     {
-        Broadcaster broadcaster = Broadcaster.getBroadcaster();
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
+
+        ArrayList<ClientHandler> clientList = clientHandlerContainer.getClientHandlers();
+
+        DataOutputStream outputStream = clientHandler.getOutputStream();
 
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
@@ -80,12 +83,10 @@ public class NameValidator extends Validator
         {
             errorPrinter.unexpectedClientShutdown();
 
-            clientList.remove(clientHandler);
+            clientHandlerContainer.removeClient(clientHandler);
 
             try
             {
-                broadcaster.alertUsersOfChanges();
-
                 clientHandler.getSocket().close();
 
             } catch (IOException e)

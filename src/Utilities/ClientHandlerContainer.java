@@ -56,5 +56,6 @@ public class ClientHandlerContainer
     {
         clientHandlers.add(clientHandler);
 
+        notifyObservers();
     }
 }

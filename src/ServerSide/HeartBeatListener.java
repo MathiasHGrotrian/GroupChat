@@ -1,5 +1,6 @@
 package ServerSide;
 
+import Utilities.ClientHandlerContainer;
 import Utilities.CountDown;
 import Utilities.ErrorPrinter;
 
@@ -9,10 +10,9 @@ import java.util.ArrayList;
 class HeartBeatListener
 {
     //checks if clients have sent heartbeats and terminates their connection if they haven't
-    boolean checkImAlive(String received, CountDown countDown, ClientHandler clientHandler,
-                         ArrayList<ClientHandler> clientList) throws IOException
+    boolean checkImAlive(String received, CountDown countDown, ClientHandler clientHandler) throws IOException
     {
-        Broadcaster broadcaster = Broadcaster.getBroadcaster();
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
 
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
@@ -24,13 +24,10 @@ class HeartBeatListener
             countDown.setOn(false);
 
             //removes clienthandler from the list of clienthandlers currently connected to server
-            clientList.remove(clientHandler);
+            clientHandlerContainer.removeClient(clientHandler);
 
             try
             {
-                //prints a list of every clienthandler connected to the server, to every client
-                broadcaster.alertUsersOfChanges();
-
                 System.out.println("QUIT " + clientHandler.getUsername());
 
                 //to quit client
@@ -44,9 +41,7 @@ class HeartBeatListener
             {
                 errorPrinter.unexpectedClientShutdown();
 
-                clientList.remove(clientHandler);
-
-                broadcaster.alertUsersOfChanges();
+                clientHandlerContainer.removeClient(clientHandler);
 
                 clientHandler.getSocket().close();
             }

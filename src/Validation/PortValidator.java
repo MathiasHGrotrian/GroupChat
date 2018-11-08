@@ -6,7 +6,6 @@ import Strategy.PortValidationStrategy;
 //part of strategy pattern
 public class PortValidator extends Validator
 {
-
     private static PortValidator portValidator;
 
     private PortValidator()
@@ -33,13 +32,6 @@ public class PortValidator extends Validator
     {
         return validate(serverPort);
     }
-
-    //checks range of port
-    /*private boolean checkServerPort(int serverPortInt, String serverPort)
-    {
-        return (serverPortInt >= 1023 && serverPortInt <= 65535 &&
-                serverPort.length() >= 4 && serverPort.length() <=5);
-    }*/
 
     //returns an int converted from a string
     public int convertPortToInt(String serverPort)
