@@ -2,7 +2,6 @@ package Utilities;
 
 import ServerSide.Broadcaster;
 import ServerSide.ClientHandler;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -14,7 +13,7 @@ public class ClientHandlerContainer
 
     private static ClientHandlerContainer clientHandlerContainer;
 
-    private ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    private ArrayList<ClientHandler> clientList = new ArrayList<>();
 
     private ClientHandlerContainer()
     {
@@ -35,9 +34,9 @@ public class ClientHandlerContainer
         return clientHandlerContainer;
     }
 
-    public ArrayList<ClientHandler> getClientHandlers()
+    public ArrayList<ClientHandler> getClientList()
     {
-        return clientHandlerContainer.clientHandlers;
+        return clientHandlerContainer.clientList;
     }
 
     public void notifyObservers() throws IOException
@@ -47,14 +46,14 @@ public class ClientHandlerContainer
 
     public void removeClient(ClientHandler clientHandler) throws IOException
     {
-        clientHandlers.remove(clientHandler);
+        clientList.remove(clientHandler);
 
         notifyObservers();
     }
 
     public void addClient(ClientHandler clientHandler) throws IOException
     {
-        clientHandlers.add(clientHandler);
+        clientList.add(clientHandler);
 
         notifyObservers();
     }

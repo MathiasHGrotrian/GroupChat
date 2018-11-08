@@ -26,18 +26,18 @@ public class Broadcaster
     }
 
     //sends messages to all connected clients
-    public void sendMessages(String received, ClientHandler handler) throws IOException
+    public void sendMessages(String received, ClientHandler clientHandler) throws IOException
     {
-        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
+        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientList();
 
         //sending message to other clients using a for each loop
-        for (ClientHandler clientHandler : clientList)
+        for (ClientHandler handler : clientList)
         {
             //the if-statment makes sure that the same client doesn't gets its own message back
             //prints out message to all other clients
-            if(!clientHandler.getUsername().equals(handler.getUsername()))
+            if(!handler.getUsername().equals(clientHandler.getUsername()))
             {
-                clientHandler.getOutputStream().writeUTF("DATA " + handler.getUsername() + " : " + received);
+                handler.getOutputStream().writeUTF("DATA " + clientHandler.getUsername() + " : " + received);
             }
         }
 
@@ -47,7 +47,7 @@ public class Broadcaster
     //is used every time a client connects to, or disconnects from the server
     public void alertUsersOfChanges() throws IOException
     {
-        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
+        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientList();
 
         String listOfClients = "";
 

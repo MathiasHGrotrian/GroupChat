@@ -1,6 +1,5 @@
 package Utilities;
 
-import ServerSide.Broadcaster;
 import ServerSide.ClientHandler;
 import Validation.NameValidator;
 import java.io.DataInputStream;

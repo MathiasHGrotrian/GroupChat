@@ -45,7 +45,7 @@ public class NameValidator extends Validator
     {
         ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
 
-        ArrayList<ClientHandler> clientList = clientHandlerContainer.getClientHandlers();
+        ArrayList<ClientHandler> clientList = clientHandlerContainer.getClientList();
 
         DataOutputStream outputStream = clientHandler.getOutputStream();
 
