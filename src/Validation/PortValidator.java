@@ -1,31 +1,29 @@
 package Validation;
 
-public class PortValidator
+import Strategy.PortValidationStrategy;
+
+//class used for validating port numbers
+//part of strategy pattern
+public class PortValidator extends Validator
 {
-    public boolean validatePort(String serverPort, int serverPortInt)
+
+    public PortValidator()
     {
-        //regular expression for checking if string contains only numbers
-        String regex = "\\d+";
+        super();
 
-        //checks if entered port matches regex and if port is within proper range
-        if(serverPort.matches(regex) && checkServerPort(serverPortInt,serverPort))
-        {
-            return true;
-        }
-
-        return false;
+        setValidationStrategy(new PortValidationStrategy());
+    }
+    public boolean validatePort(String serverPort)
+    {
+        return validate(serverPort);
     }
 
     //checks range of port
-    private boolean checkServerPort(int serverPortInt, String serverPort)
+    /*private boolean checkServerPort(int serverPortInt, String serverPort)
     {
-        if (serverPortInt >= 1023 && serverPortInt <= 65535 && serverPort.length() >= 4 && serverPort.length() <=5)
-        {
-            return true;
-        }
-
-        return false;
-    }
+        return (serverPortInt >= 1023 && serverPortInt <= 65535 &&
+                serverPort.length() >= 4 && serverPort.length() <=5);
+    }*/
 
     //returns an int converted from a string
     public int convertPortToInt(String serverPort)

@@ -1,19 +1,23 @@
-package ServerSide;
+package Utilities;
 
-import Utilities.ErrorPrinter;
+import ServerSide.Broadcaster;
+import ServerSide.ClientHandler;
 import Validation.NameValidator;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+//class used to name clienthandlers
 public class ClientNamer
 {
     public void nameClient(ArrayList<ClientHandler> clientList, DataInputStream inputStream,
-                            DataOutputStream outputStream, ClientHandler handler,
-                            Broadcaster broadcaster, ErrorPrinter errorPrinter) throws IOException
+                           DataOutputStream outputStream, ClientHandler handler) throws IOException
     {
+        Broadcaster broadcaster = Broadcaster.getBroadcaster();
+
+        ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+
         NameValidator nameValidator = new NameValidator();
 
         boolean isBeingNamed = true;
@@ -55,7 +59,7 @@ public class ClientNamer
                         System.out.println(ack);
 
                         //prints list of clienthandlers as clienthandler has been succesfully named and added to list
-                        broadcaster.alertUsersOfChanges(clientList, outputStream, errorPrinter, handler);
+                        broadcaster.alertUsersOfChanges(clientList, outputStream, handler);
 
                         //breaks out of loop when username is ok
                         isBeingNamed = false;
@@ -66,9 +70,9 @@ public class ClientNamer
             {
                 errorPrinter.unexpectedClientShutdown();
 
-                clientList.remove(this);
+                clientList.remove(handler);
 
-                broadcaster.alertUsersOfChanges(clientList, outputStream, errorPrinter, handler);
+                broadcaster.alertUsersOfChanges(clientList, outputStream, handler);
 
                 handler.getSocket().close();
 

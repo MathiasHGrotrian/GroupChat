@@ -1,14 +1,16 @@
+package Utilities;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CountDown implements Runnable
 {
     //initiate variables
-    int secondsPassed = 0;
-    boolean isOn = true;
-    Timer timer = new Timer();
+    private int secondsPassed = 0;
+    private boolean isOn = true;
+    private Timer timer = new Timer();
 
-    TimerTask timerTask = new TimerTask()
+    private TimerTask timerTask = new TimerTask()
     {
         @Override
         public void run()

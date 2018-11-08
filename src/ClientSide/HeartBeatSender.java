@@ -5,14 +5,17 @@ import Utilities.ErrorPrinter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+//class used to send heartbeat to server
 class HeartBeatSender
 {
     //starts a thread which sends out a heartbeat to the server every 60 seconds
-    public void imAlive(DataOutputStream outputStream, ErrorPrinter errorPrinter)
+    void imAlive(DataOutputStream outputStream)
     {
         //thread for sending I'm alive messages each time 60 seconds have passed
         Thread imAlive = new Thread(new Runnable()
         {
+            ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+
             @Override
             public void run()
             {

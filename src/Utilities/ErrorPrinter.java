@@ -1,7 +1,26 @@
 package Utilities;
 
-public class MessagePrinter
+//singleton class used to print out error messages to clients
+public class ErrorPrinter
 {
+    private static ErrorPrinter errorPrinter;
+
+    private ErrorPrinter(){}
+
+    public static ErrorPrinter getErrorPrinter()
+    {
+        synchronized (ErrorPrinter.class)
+        {
+            if(errorPrinter == null)
+            {
+                errorPrinter = new ErrorPrinter();
+            }
+
+            return errorPrinter;
+        }
+    }
+
+
     public void IPAndPortErPrinter(boolean IPIsValid, boolean portIsValid)
     {
         //help messages if input isn't valid
@@ -51,7 +70,7 @@ public class MessagePrinter
         System.out.println("J_ER 504: Client disconnected unexpectedly");
     }
 
-    public void badIPAndPort()
+    private void badIPAndPort()
     {
         System.out.println("J_ER 505: Invalid IP address and serverport number\n" +
                 "Please make sure you are using an IPv4 address and the format: 0-255.0-255.0-255.0-255\n" +
@@ -64,13 +83,13 @@ public class MessagePrinter
                 "Make sure you have the right IPv4 address and port number\n");
     }
 
-    public void badIP()
+    private void badIP()
     {
         System.out.println("J_ER 507: Invalid IP address\n" +
                 "Please make sure you are using an IPv4 address and the format: 0-255.0-255.0-255.0-255\n");
     }
 
-    public void badPort()
+    private void badPort()
     {
         System.out.println("J_ER 508: Invalid serverport number. No letters or symbols allowed\n" +
                 "Please use a port number between 1023-65535. No letters or symbols allowed in port number\n");

@@ -7,15 +7,18 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+//class used for receiving messages from the server and displaying them to the client
 class MessageReceiver
 {
     //starts a thread for reading messages from other clients and the server
-    public void readMessage(DataInputStream inputStream, Socket socket,
-                            DataOutputStream outputStream, ErrorPrinter errorPrinter)
+    void readMessage(DataInputStream inputStream, Socket socket,
+                            DataOutputStream outputStream)
     {
         //thread for reading messages
         Thread readMessage = new Thread(() ->
         {
+            ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+
             while (true)
             {
                 try

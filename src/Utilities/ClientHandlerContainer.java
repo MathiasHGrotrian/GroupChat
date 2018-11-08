@@ -1,32 +1,33 @@
 package Utilities;
 
 import ServerSide.ClientHandler;
-
 import java.util.ArrayList;
 
-public class SingletonList
+//singleton class used for holding instance of arraylist containing clienthandlers
+public class ClientHandlerContainer
 {
-    private static SingletonList singletonList;
+    private static ClientHandlerContainer clientHandlerContainer;
 
     private ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
-    private SingletonList(){}
+    private ClientHandlerContainer(){}
 
-    public static SingletonList getListOfClients()
+    public static ClientHandlerContainer getListOfClients()
     {
-        synchronized (SingletonList.class)
+        //makes the initialization of class thread safe
+        synchronized (ClientHandlerContainer.class)
         {
-            if(singletonList == null)
+            if(clientHandlerContainer == null)
             {
-                singletonList = new SingletonList();
+                clientHandlerContainer = new ClientHandlerContainer();
             }
         }
 
-        return singletonList;
+        return clientHandlerContainer;
     }
 
     public ArrayList<ClientHandler> getClientHandlers()
     {
-        return singletonList.clientHandlers;
+        return clientHandlerContainer.clientHandlers;
     }
 }
