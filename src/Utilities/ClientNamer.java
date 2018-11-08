@@ -18,7 +18,7 @@ public class ClientNamer
 
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
-        NameValidator nameValidator = new NameValidator();
+        NameValidator nameValidator = NameValidator.getNameValidator();
 
         boolean isBeingNamed = true;
 
@@ -34,7 +34,8 @@ public class ClientNamer
                 String userName;
 
                 //sends a request about a username
-                outputStream.writeUTF("Type username");
+                outputStream.writeUTF("Type username\n" +
+                        "Only letters, digits, - and _ allowed");
 
                 //receive a string, userName
                 userName = inputStream.readUTF();
@@ -59,7 +60,7 @@ public class ClientNamer
                         System.out.println(ack);
 
                         //prints list of clienthandlers as clienthandler has been succesfully named and added to list
-                        broadcaster.alertUsersOfChanges(clientList, outputStream, handler);
+                        broadcaster.alertUsersOfChanges();
 
                         //breaks out of loop when username is ok
                         isBeingNamed = false;
@@ -68,11 +69,11 @@ public class ClientNamer
             }
             catch (IOException ioEx)
             {
+                ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
+
                 errorPrinter.unexpectedClientShutdown();
 
-                clientList.remove(handler);
-
-                broadcaster.alertUsersOfChanges(clientList, outputStream, handler);
+                clientHandlerContainer.removeClient(handler);
 
                 handler.getSocket().close();
 

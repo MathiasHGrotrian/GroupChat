@@ -29,7 +29,7 @@ class HeartBeatListener
             try
             {
                 //prints a list of every clienthandler connected to the server, to every client
-                broadcaster.alertUsersOfChanges(clientList, clientHandler.getOutputStream(), clientHandler);
+                broadcaster.alertUsersOfChanges();
 
                 System.out.println("QUIT " + clientHandler.getUsername());
 
@@ -46,7 +46,7 @@ class HeartBeatListener
 
                 clientList.remove(clientHandler);
 
-                broadcaster.alertUsersOfChanges(clientList, clientHandler.getOutputStream(), clientHandler);
+                broadcaster.alertUsersOfChanges();
 
                 clientHandler.getSocket().close();
             }

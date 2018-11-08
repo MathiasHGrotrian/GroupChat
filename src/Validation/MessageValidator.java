@@ -11,6 +11,23 @@ import java.util.ArrayList;
 //not yet integrated as part of strategy pattern
 public class MessageValidator
 {
+    private static MessageValidator messageValidator;
+
+    private MessageValidator() {}
+
+    public static MessageValidator getMessageValidator()
+    {
+        synchronized (MessageValidator.class)
+        {
+            if(messageValidator == null)
+            {
+                messageValidator = new MessageValidator();
+            }
+
+            return messageValidator;
+        }
+    }
+
     //checks contents of messages and responds depending on the contents
     public boolean checkMessage(String received, DataOutputStream outputStream,
                                 ClientHandler clientHandler, ArrayList<ClientHandler> clientList) throws IOException
@@ -33,7 +50,7 @@ public class MessageValidator
 
             //prints a list of every clienthandler connected to the server, to every client
             //is updated when a client disconnects from server
-            broadcaster.alertUsersOfChanges(clientList, outputStream, clientHandler);
+            broadcaster.alertUsersOfChanges();
 
             System.out.println("QUIT " + clientHandler.getUsername());
 
@@ -51,8 +68,6 @@ public class MessageValidator
         }
         else if(received.equalsIgnoreCase("imav"))
         {
-            outputStream.writeUTF(errorPrinter.badCommand());
-
             return true;
         }
 

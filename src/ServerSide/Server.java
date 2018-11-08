@@ -20,7 +20,7 @@ public class Server
 
     private static void startServer() throws IOException
     {
-        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getListOfClients().getClientHandlers();
+        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
         
         //create a socket for server and an open socket
         //one socket for server and one for ClientHandler
@@ -44,9 +44,7 @@ public class Server
             Thread thread = new Thread(clientHandler);
 
             //adds clienthandler to list of clienthandlers
-            clientList.add(clientHandler);
-
-            updateListOfUsers(clientList);
+            clientHandlerContainer.addClient(clientHandler);
 
             //starts the clienthandler thread
             thread.start();

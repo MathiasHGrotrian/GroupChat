@@ -7,12 +7,28 @@ import Strategy.PortValidationStrategy;
 public class PortValidator extends Validator
 {
 
-    public PortValidator()
+    private static PortValidator portValidator;
+
+    private PortValidator()
     {
         super();
 
         setValidationStrategy(new PortValidationStrategy());
     }
+
+    public static PortValidator getPortValidator()
+    {
+        synchronized (PortValidator.class)
+        {
+            if(portValidator == null)
+            {
+                portValidator = new PortValidator();
+            }
+
+            return portValidator;
+        }
+    }
+
     public boolean validatePort(String serverPort)
     {
         return validate(serverPort);

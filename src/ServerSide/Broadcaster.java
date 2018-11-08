@@ -1,7 +1,7 @@
 package ServerSide;
 
-import Utilities.ErrorPrinter;
-import java.io.DataOutputStream;
+import Utilities.ClientHandlerContainer;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -44,10 +44,9 @@ public class Broadcaster
 
     //prints an arraylist of clienthandlers out in a readable format
     //is used every time a client connects to, or disconnects from the server
-    public void alertUsersOfChanges(ArrayList<ClientHandler> clientList, DataOutputStream outputStream,
-                                    ClientHandler handler) throws IOException
+    public void alertUsersOfChanges() throws IOException
     {
-        ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
 
         String listOfClients = "";
 
@@ -60,20 +59,8 @@ public class Broadcaster
         }
         for(ClientHandler clientHandler : clientList)
         {
-            try
-            {
-                clientHandler.getOutputStream().writeUTF("LIST "
-                        + listOfClients);
-            } catch (IOException ioEx)
-            {
-                errorPrinter.unexpectedClientShutdown();
-
-                clientList.remove(handler);
-
-                broadcaster.alertUsersOfChanges(clientList, outputStream, handler);
-
-                handler.getSocket().close();
-            }
+            clientHandler.getOutputStream().writeUTF("LIST "
+                    + listOfClients);
         }
 
     }

@@ -13,10 +13,6 @@ import java.util.ArrayList;
 
 public class ClientHandler implements Runnable
 {
-    private static MessageValidator messageValidator = new MessageValidator();
-
-    private static HeartBeatListener heartBeatListener = new HeartBeatListener();
-
     //variables
     private String username;
     private final DataInputStream inputStream;
@@ -25,6 +21,8 @@ public class ClientHandler implements Runnable
     private ArrayList<ClientHandler> userList;
     private Broadcaster broadcaster;
     private ClientNamer clientNamer;
+    private MessageValidator messageValidator;
+    private HeartBeatListener heartBeatListener;
 
     //constructor
     ClientHandler(Socket socket, DataInputStream inputStream, DataOutputStream outputStream)
@@ -36,6 +34,8 @@ public class ClientHandler implements Runnable
         this.userList = new ArrayList<>();
         this.broadcaster = Broadcaster.getBroadcaster();
         this.clientNamer = new ClientNamer();
+        this.messageValidator = MessageValidator.getMessageValidator();
+        this.heartBeatListener = new HeartBeatListener();
     }
 
 
@@ -62,7 +62,7 @@ public class ClientHandler implements Runnable
     public void run() {
 
         //list of clienthandlers stored i singleton
-        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getListOfClients().getClientHandlers();
+        ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientHandlers();
 
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
@@ -112,7 +112,7 @@ public class ClientHandler implements Runnable
                 {
                     clientList.remove(this);
 
-                    broadcaster.alertUsersOfChanges(clientList, outputStream, this);
+                    broadcaster.alertUsersOfChanges();
 
                     //alertUsersOfChanges(clientList, outputStream);
 

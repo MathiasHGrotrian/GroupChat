@@ -48,6 +48,8 @@ class MessageReceiver
                 {
                     try
                     {
+
+
                         socket.close();
 
                         System.exit(1);

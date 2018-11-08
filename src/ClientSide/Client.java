@@ -109,9 +109,9 @@ public class Client
     {
         ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
-        IPv4Validator iPv4Validator = new IPv4Validator();
+        IPv4Validator iPv4Validator = IPv4Validator.getIPv4Validator();
 
-        PortValidator portValidator = new PortValidator();
+        PortValidator portValidator = PortValidator.getPortValidator();
 
         //scanner used for getting server ip and port from user
         Scanner scanner = new Scanner(System.in);

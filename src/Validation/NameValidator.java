@@ -12,7 +12,9 @@ import java.util.ArrayList;
 //part of strategy pattern
 public class NameValidator extends Validator
 {
-    public NameValidator()
+    private static NameValidator nameValidator;
+
+    private NameValidator()
     {
         super();
 
@@ -20,18 +22,24 @@ public class NameValidator extends Validator
 
     }
 
+    public static NameValidator getNameValidator()
+    {
+        synchronized (NameValidator.class)
+        {
+            if(nameValidator == null)
+            {
+                nameValidator = new NameValidator();
+            }
+
+            return nameValidator;
+        }
+    }
+
     public boolean validateName(String username)
     {
         return validate(username);
     }
 
-    /*public boolean validateName(String userName)
-    {
-        Pattern namePattern = Pattern.compile("[a-z0-9_-æøå]", Pattern.CASE_INSENSITIVE);
-        Matcher nameMatcher = namePattern.matcher(userName);
-
-        return nameMatcher.find();
-    }*/
 
     public boolean checkName(String userName, DataOutputStream outputStream,
                              ClientHandler clientHandler, ArrayList<ClientHandler> clientList)
@@ -76,7 +84,7 @@ public class NameValidator extends Validator
 
             try
             {
-                broadcaster.alertUsersOfChanges(clientList, outputStream, clientHandler);
+                broadcaster.alertUsersOfChanges();
 
                 clientHandler.getSocket().close();
 
