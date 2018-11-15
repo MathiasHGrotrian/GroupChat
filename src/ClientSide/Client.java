@@ -141,11 +141,6 @@ public class Client
 
             portIsValid = portValidator.validatePort(serverPort);
 
-            /*if (portIsValid)
-            {
-                serverPortInt = portValidator.convertPortToInt(serverPort);
-            }*/
-
             errorPrinter.IPAndPortErPrinter(IPIsValid, portIsValid);
 
             //checks if all inputs are valid and sets up connection if true

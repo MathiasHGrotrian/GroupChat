@@ -39,7 +39,7 @@ public class ClientHandlerContainer
         return clientHandlerContainer.clientList;
     }
 
-    public void notifyObservers() throws IOException
+    private void notifyObservers() throws IOException
     {
         broadcaster.alertUsersOfChanges();
     }
@@ -51,7 +51,7 @@ public class ClientHandlerContainer
         notifyObservers();
     }
 
-    public void addClient(ClientHandler clientHandler) throws IOException
+    void addClient(ClientHandler clientHandler) throws IOException
     {
         clientList.add(clientHandler);
 

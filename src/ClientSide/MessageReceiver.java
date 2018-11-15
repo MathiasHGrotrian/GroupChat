@@ -19,7 +19,9 @@ class MessageReceiver
         {
             ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
-            while (true)
+            boolean isReading = true;
+
+            while(isReading)
             {
                 try
                 {
@@ -48,9 +50,11 @@ class MessageReceiver
                 {
                     try
                     {
-
+                        isReading = false;
 
                         socket.close();
+
+                        errorPrinter.unexpectedServerShutdown();
 
                         System.exit(1);
                     }

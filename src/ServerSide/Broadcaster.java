@@ -1,7 +1,6 @@
 package ServerSide;
 
 import Utilities.ClientHandlerContainer;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -49,13 +48,13 @@ public class Broadcaster
     {
         ArrayList<ClientHandler> clientList = ClientHandlerContainer.getClientContainer().getClientList();
 
-        String listOfClients = "";
+        StringBuilder listOfClients = new StringBuilder();
 
         for (ClientHandler clienthandler : clientList)
         {
             if(clienthandler.getUsername().length() != 0)
             {
-                listOfClients += clienthandler.getUsername() + " ";
+                listOfClients.append(clienthandler.getUsername()).append(" ");
             }
         }
         for(ClientHandler clientHandler : clientList)

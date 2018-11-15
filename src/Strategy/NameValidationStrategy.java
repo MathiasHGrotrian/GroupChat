@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 //part of strategy pattern
 public class NameValidationStrategy implements ValidationStrategy
 {
-
     @Override
     public boolean validationStrategy(String userName)
     {

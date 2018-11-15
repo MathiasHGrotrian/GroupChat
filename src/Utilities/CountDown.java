@@ -48,7 +48,7 @@ public class CountDown implements Runnable
         start();
     }
 
-    public void start()
+    private void start()
     {
         timer.scheduleAtFixedRate(timerTask, 1000, 1000);
     }

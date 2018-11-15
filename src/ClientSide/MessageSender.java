@@ -17,9 +17,9 @@ class MessageSender
         {
             ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
-            boolean isSendingMessages = true;
+            boolean isSending = true;
 
-            while (isSendingMessages)
+            while (isSending)
             {
                 //sets the message to users input from scanner
                 String message = scanner.nextLine();
@@ -34,7 +34,11 @@ class MessageSender
                     //closes connection and shuts down if it has
                     if(message.equals("QUIT"))
                     {
+                        isSending = false;
+
                         socket.close();
+
+                        errorPrinter.unexpectedServerShutdown();
 
                         System.exit(1);
                     }

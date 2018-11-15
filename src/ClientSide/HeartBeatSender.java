@@ -1,7 +1,6 @@
 package ClientSide;
 
 import Utilities.ErrorPrinter;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -16,10 +15,12 @@ class HeartBeatSender
         {
             ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
+            boolean isAlive = true;
+
             @Override
             public void run()
             {
-                while(true)
+                while(isAlive)
                 {
                     try
                     {
@@ -29,14 +30,11 @@ class HeartBeatSender
                         //after thread has woken up, sends out I'm alive message to server
                         outputStream.writeUTF("IMAV");
 
-                    } catch (InterruptedException iEx)
-                    {
-                        errorPrinter.unexpectedServerShutdown();
-                    }
-                    catch (IOException ioEx)
+                    } catch (InterruptedException | IOException iEx)
                     {
                         errorPrinter.unexpectedServerShutdown();
 
+                        isAlive = false;
                     }
                 }
 
