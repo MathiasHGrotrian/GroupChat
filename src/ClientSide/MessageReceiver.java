@@ -8,64 +8,71 @@ import java.io.IOException;
 import java.net.Socket;
 
 //class used for receiving messages from the server and displaying them to the client
-class MessageReceiver
+class MessageReceiver implements Runnable
 {
-    //starts a thread for reading messages from other clients and the server
-    void readMessage(DataInputStream inputStream, Socket socket,
-                            DataOutputStream outputStream)
+
+    private Socket socket;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
+    private ErrorPrinter errorPrinter;
+
+    MessageReceiver(Socket socket,
+                    DataInputStream inputStream,
+                    DataOutputStream outputStream)
     {
-        //thread for reading messages
-        Thread readMessage = new Thread(() ->
+        this.socket = socket;
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+        this.errorPrinter = ErrorPrinter.getErrorPrinter();
+    }
+
+    //starts a thread for reading messages from other clients and the server
+    public void run()
+    {
+        boolean isReading = true;
+
+        while(isReading)
         {
-            ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+            try
+            {
+                //reads the message from the servers outputstrem
+                String message = inputStream.readUTF();
 
-            boolean isReading = true;
+                //prints out the message received from server
+                System.out.println(message);
 
-            while(isReading)
+                //if the received message is "QUIT", you are kicked out by admin (^^)
+                if(message.equals("QUIT"))
+                {
+                    socket.close();
+
+                    System.exit(1);
+                }
+
+                if(message.equals("J_OK"))
+                {
+                    outputStream.writeUTF("J_OK");
+                }
+
+            }
+            //in case of unexpected errors
+            catch (IOException ioEx)
             {
                 try
                 {
-                    //reads the message from the servers outputstrem
-                    String message = inputStream.readUTF();
+                    isReading = false;
 
-                    //prints out the message received from server
-                    System.out.println(message);
+                    socket.close();
 
-                    //if the received message is "QUIT", you are kicked out by admin (^^)
-                    if(message.equals("QUIT"))
-                    {
-                        socket.close();
+                    errorPrinter.unexpectedServerShutdown();
 
-                        System.exit(1);
-                    }
-
-                    if(message.equals("J_OK"))
-                    {
-                        outputStream.writeUTF("J_OK");
-                    }
-
+                    System.exit(1);
                 }
-                //in case of unexpected errors
-                catch (IOException ioEx)
+                catch (IOException e)
                 {
-                    try
-                    {
-                        isReading = false;
-
-                        socket.close();
-
-                        errorPrinter.unexpectedServerShutdown();
-
-                        System.exit(1);
-                    }
-                    catch (IOException e)
-                    {
-                        errorPrinter.unexpectedServerShutdown();
-                    }
+                    errorPrinter.unexpectedServerShutdown();
                 }
             }
-        });
-
-        readMessage.start();
+        }
     }
 }

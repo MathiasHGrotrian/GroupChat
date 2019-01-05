@@ -8,47 +8,52 @@ import java.net.Socket;
 import java.util.Scanner;
 
 //class used for sending messages from client to server
-class MessageSender
+class MessageSender implements Runnable
 {
-    //starts a thread for sending messages to other clients
-    void sendMessages(DataOutputStream outputStream, Scanner scanner, Socket socket)
+    private DataOutputStream outputStream;
+    private Socket socket;
+    private Scanner scanner;
+    private ErrorPrinter errorPrinter;
+
+    MessageSender(DataOutputStream outputStream, Socket socket, Scanner scanner)
     {
-        Thread sendMessage = new Thread(() ->
+        this.outputStream = outputStream;
+        this.socket = socket;
+        this.scanner = scanner;
+        this.errorPrinter = ErrorPrinter.getErrorPrinter();
+    }
+    @Override
+    public void run()
+    {
+        boolean isSending = true;
+
+        while (isSending)
         {
-            ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
+            //sets the message to users input from scanner
+            String message = scanner.nextLine();
 
-            boolean isSending = true;
-
-            while (isSending)
+            try
             {
-                //sets the message to users input from scanner
-                String message = scanner.nextLine();
 
-                try
+                //sends message to server by writing on the output stream
+                outputStream.writeUTF(message);
+
+                //checks if exit message has been typed
+                //closes connection and shuts down if it has
+                if(message.equals("QUIT"))
                 {
+                    isSending = false;
 
-                    //sends message to server by writing on the output stream
-                    outputStream.writeUTF(message);
+                    socket.close();
 
-                    //checks if exit message has been typed
-                    //closes connection and shuts down if it has
-                    if(message.equals("QUIT"))
-                    {
-                        isSending = false;
-
-                        socket.close();
-
-                        errorPrinter.unexpectedServerShutdown();
-
-                        System.exit(1);
-                    }
-                } catch (IOException e)
-                {
                     errorPrinter.unexpectedServerShutdown();
-                }
-            }
-        });
 
-        sendMessage.start();
+                    System.exit(1);
+                }
+            } catch (IOException e)
+            {
+                errorPrinter.unexpectedServerShutdown();
+            }
+        }
     }
 }

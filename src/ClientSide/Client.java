@@ -6,6 +6,8 @@ import Validation.PortValidator;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Client
 {
@@ -53,20 +55,21 @@ public class Client
 
         try
         {
-            MessageSender messageSender = new MessageSender();
-
-            MessageReceiver messageReceiver = new MessageReceiver();
-
-            HeartBeatSender heartBeatSender = new HeartBeatSender();
 
             //initializing inputstream
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
 
-            messageSender.sendMessages(outputStream, scanner, socket);
+            MessageSender messageSender = new MessageSender(outputStream, socket, scanner);
 
-            messageReceiver.readMessage(inputStream, socket, outputStream);
+            MessageReceiver messageReceiver = new MessageReceiver(socket, inputStream, outputStream);
 
-            heartBeatSender.imAlive(outputStream);
+            HeartBeatSender heartBeatSender = new HeartBeatSender(outputStream);
+
+            ExecutorService executorService= Executors.newCachedThreadPool();
+
+            executorService.execute(messageReceiver);
+            executorService.execute(heartBeatSender);
+            executorService.execute(messageSender);
         }
         catch (IOException ioEx)
         {
@@ -96,6 +99,7 @@ public class Client
             outputStream.writeUTF("");
 
             setupChat(socket, scanner, outputStream);
+
         }
         catch (IOException ioEx)
         {

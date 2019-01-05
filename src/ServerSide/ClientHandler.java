@@ -21,6 +21,8 @@ public class ClientHandler implements Runnable
     private ClientNamer clientNamer;
     private MessageValidator messageValidator;
     private HeartBeatListener heartBeatListener;
+    private ErrorPrinter errorPrinter;
+    private ClientHandlerContainer clientHandlerContainer;
 
     //constructor
     ClientHandler(Socket socket, DataInputStream inputStream, DataOutputStream outputStream)
@@ -32,6 +34,8 @@ public class ClientHandler implements Runnable
         this.clientNamer = new ClientNamer();
         this.messageValidator = MessageValidator.getMessageValidator();
         this.heartBeatListener = new HeartBeatListener();
+        this.errorPrinter = ErrorPrinter.getErrorPrinter();
+        this.clientHandlerContainer = ClientHandlerContainer.getClientContainer();
     }
 
 
@@ -53,10 +57,6 @@ public class ClientHandler implements Runnable
 
     @Override
     public void run() {
-
-        ClientHandlerContainer clientHandlerContainer = ClientHandlerContainer.getClientContainer();
-
-        ErrorPrinter errorPrinter = ErrorPrinter.getErrorPrinter();
 
         //variable for receiving message
         String received;
